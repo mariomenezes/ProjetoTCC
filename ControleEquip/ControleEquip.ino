@@ -5,8 +5,14 @@
 //#include <String.h>
 
 #include <Ethernet.h>
+#include <SD.h>
 
 
+//-------------------Configuracao SdCard----------------------------
+
+
+#define PIN_SD_CARD 4
+File myFile;
 
 //-------------------------------------------------------------------
 
@@ -69,6 +75,9 @@ EthernetUDP Udp;
 
 //--------------------------------------------------------------------
 void setup(){
+  
+  // Seta porta SdCard
+  pinMode(PIN_SD_CARD, OUTPUT);
   // Inicia o Ethernet
   //Ethernet.begin(mac, ip);
   Ethernet.begin(mac, ip, gateway, subnet);
@@ -295,4 +304,46 @@ unsigned long sendNTPpacket(IPAddress& address)
   Udp.endPacket(); 
 }
 
+void escreveArffSd(){
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
+  
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  myFile = SD.open("test.txt", FILE_WRITE);
+  
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to test.txt...");
+    myFile.println("testing 1, 2, 3.");
+	// close the file:
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  }
+ 
+}
 
+String lerArffSd(){
+  
+  // re-open the file for reading:
+  myFile = SD.open("test.txt");
+  if (myFile) {
+    Serial.println("test.txt:");
+    
+    // read from the file until there's nothing else in it:
+    while (myFile.available()) {
+    	Serial.write(myFile.read());
+    }
+    // close the file:
+    myFile.close();
+  } else {
+  	// if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+  } 
+}
