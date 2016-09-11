@@ -1,0 +1,21 @@
+@relation Seguradora
+
+@attribute sexo {F, M}
+
+@attribute faixa_etaria {<25, 25-30, 31-40, >40}
+
+@attribute acidente {Sim, Nao}
+
+@data
+
+F,>40,Nao
+
+M,<25,Sim
+
+F,<25,Nao
+
+F,31-40,Nao
+
+M,25-30,Nao
+
+M,<25,Sim
