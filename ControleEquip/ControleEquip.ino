@@ -542,7 +542,7 @@ boolean define_programacao_diaria(){
     estado = false; 
   }
     
-  retorno_programar = programarTomada(1, false, 2, 20); //Tomada 2, desligar, 2 horas e 20 minutos
+  retorno_programar = programarTomada(1, true, 2, 20); //Tomada 2, desligar, 2 horas e 20 minutos
   if(retorno_programar){
     Serial.println("Programacao efetuada com sucesso.");
     estado = true;
@@ -552,7 +552,7 @@ boolean define_programacao_diaria(){
     estado = false;
   }
     
-  retorno_programar = programarTomada(2, false, 6, 0); //Tomada 3, desligar, 6 horas e 0 minutos
+  retorno_programar = programarTomada(2, true, 5, 50); //Tomada 3, desligar, 6 horas e 0 minutos
   if(retorno_programar){
     Serial.println("Programacao efetuada com sucesso.");
     estado = true;
