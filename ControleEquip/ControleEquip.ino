@@ -1,20 +1,30 @@
-  //----------------------------------------------------------------------------------------------------------//
-//Creditos
 /*
-alterado por Fabiano A. Arndt,
-baseados nos créditos abaixo.
+ * Time_NTP.pde
+ * Example showing time sync to NTP time source
+ *
+ * This sketch uses the Ethernet library
+ */
  
-fabianoallex@gmail.com
-www.youtube.com/fabianoallex
-*/
-//Fim Creditos 
-#include <SPI.h>
-
-//#include <String.h>
-
+#include <TimeLib.h>
 #include <Ethernet.h>
+#include <EthernetUdp.h>
+#include <SPI.h>
 #include <SD.h>
-#include "Dns.h"
+
+//----------array para programacao de eventos-----------
+
+struct programar{
+  int  id_tomada; 
+  int hora;
+  int minutos;
+  boolean comando; //True - liga, false - desliga
+};
+
+#define array_programar_size 8
+
+programar array_programar[array_programar_size];
+
+int cont_array_programar = 0;
 
 //---------------Configuracao sensor temperatura LM35-----
 
@@ -28,7 +38,7 @@ File myFile;
 
 //-------------------------------------------------------------------
 
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };//MAC padrão;
+//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };//MAC padrão;
 
 IPAddress ip(10, 10, 0, 50);//Define o endereco IPv4(trocar final);
 
@@ -38,20 +48,6 @@ IPAddress subnet(255, 255, 255, 0); //Define a máscara de rede
 
 EthernetServer server(80); // Porta de serviço
 
-//-------------------------------------------------------------------
-
-//int AA0 = A0;//Arduino analogica A0;
-
-//int AA1 = A1;//Arduino analogica A1;
-
-//int AA2 = A2;//Arduino analogica A2;
-
-//int AA3 = A3;//Arduino analogica A3;
-
-//int AA4 = A4;//Arduino analogica A4;
-
-//-------------------------------------------------------------------
-
 //int D2 = 2;//Arduino digital D2;
 int tomada1 = 5;//Arduino digital D5;
 int tomada2 = 6;//Arduino digital D6;
@@ -59,69 +55,88 @@ int tomada3 = 7;//Arduino digital D7;
 int tomada4 = 8;//Arduino digital D8;
 //-------------------------------------------------------------------
 String readString = String(30); // string para buscar dados de endereço
-//boolean statusA0 = false; // Variável para o status do led 
-//boolean statusA1 = false; // Variável para o status do led 
-//boolean statusA2 = false; // Variável para o status do led 
-//boolean statusA3 = false; // Variável para o status do led 
-//boolean statusA4 = false; // Variável para o status do led 
-//boolean statusD2 = false; // Variável para o status do led 
+
 boolean statusT1 = false; // Variável para o status do led 
 boolean statusT2 = false; // Variável para o status do led 
 boolean statusT3 = false; // Variável para o status do led 
 boolean statusT4 = false; // Variável para o status do led 
-//----Configuracoes do CLiente NTP----------------------------------------------------------------
-unsigned int localPort = 8888;      // local port to listen for UDP packets
-//host para a primeira tentativa
-const char* host = "ntp02.oal.ul.pt";  // servidor da NTP.br - ver lista acima para todos os servidores da NTP.br
-//const char* host = "192.168.200.254";  // servidor interno 01 - caso tenha um servidor de hora interno, pode ser configurado o nome ou ip na variavel host
-//const char* host = "192.168.200.253";  // servidor interno 02
- 
 
-DNSClient Dns;
-IPAddress rem_add;
-//
 
-//IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov NTP server
-// IPAddress timeServer(132, 163, 4, 102); // time-b.timefreq.bldrdoc.gov NTP server
-// IPAddress timeServer(132, 163, 4, 103); // time-c.timefreq.bldrdoc.gov NTP server
-IPAddress timeServer(200, 192, 232, 8);
 
-const int NTP_PACKET_SIZE= 48; // NTP time stamp is in the first 48 bytes of the message
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; 
 
-byte packetBuffer[ NTP_PACKET_SIZE]; //buffer to hold incoming and outgoing packets 
+// NTP Servers:
+IPAddress timeServer(132, 163, 4, 101); // time-a.timefreq.bldrdoc.gov
 
-// A UDP instance to let us send and receive packets over UDP
+const int timeZone = -3; //acredito que seja essa notacao para o Brasil
+
+
 EthernetUDP Udp;
+unsigned int localPort = 8888;  // local port to listen for UDP packets
 
-
-//--------------------------------------------------------------------
-void setup(){
+void setup() 
+{
   
-  // Seta porta SdCard
-  pinMode(PIN_SD_CARD, OUTPUT);
-  // Inicia o Ethernet
-  //Ethernet.begin(mac, ip);
-  Ethernet.begin(mac, ip, gateway, subnet);
-  server.begin();
-//-----------------------Define pino como saída-----------------------
-  //pinMode(AA0, OUTPUT);
-  //pinMode(AA1, OUTPUT);
-  //pinMode(AA2, OUTPUT);
-  //pinMode(AA3, OUTPUT);
-  //pinMode(AA4, OUTPUT);
- // pinMode(D2, OUTPUT);
+  //Verificar a necessidade de persistir esses dados, pois caso o arduino desligue, tudo se perder
+  for(int i = 0; i < array_programar_size; ++i){
+    array_programar[i].id_tomada = -1;
+    array_programar[i].hora = -1;
+    array_programar[i].minutos = -1;
+    array_programar[i].comando = -1;
+  }
+  
   pinMode(tomada1, OUTPUT);
   pinMode(tomada2, OUTPUT);
   pinMode(tomada3, OUTPUT);
   pinMode(tomada4, OUTPUT);
-//---------------------------------------------------------------------
-  // Inicia a comunicação Serial
-  Serial.begin(9600); 
+    
+  // Seta porta SdCard
+  pinMode(PIN_SD_CARD, OUTPUT);
+  
+  Serial.begin(9600);
+  while (!Serial) ; // Needed for Leonardo only
+  delay(250);
+  Serial.println("Hora NTP");
+  
+  Ethernet.begin(mac, ip);
+  Serial.print("IP Arduino ");
+  Serial.println(Ethernet.localIP());
+  Udp.begin(localPort);
+  Serial.println("Esperando Sincronizar NTP");
+  setSyncProvider(getNtpTime);
+  define_programacao_diaria();
+  
 }
 
-void loop(){
+time_t prevDisplay = 0; // when the digital clock was displayed
+
+
+//EthernetClient client;
+
+void loop()
+{  
+  if (timeStatus() != timeNotSet) {
+    if (now() != prevDisplay) { //update the display only if time has changed
+      prevDisplay = now();
+      digitalClockDisplay();  
+    }
+  }
+  
+//  client = server.available();
+
+  controleTomadas();
+  executa_programacao();
+  //lista_programacao();
+  
+  //delay(2000);
+
+}
+
+EthernetClient client;
+
+void controleTomadas(){
   // Criar uma conexão de cliente
-  EthernetClient client = server.available();
+client = server.available();
   
   if (client) {
     while (client.connected())
@@ -143,6 +158,7 @@ void loop(){
 //------------------------------------------------------------------        
           if(readString.indexOf("t1high")>=0)//Recebido do Android;
           {
+            Serial.println("Entrou1");
             // O Led vai ser ligado
             digitalWrite(tomada1, HIGH);//Arduino porta digital D5=5V;
             statusT1 = true;
@@ -244,127 +260,66 @@ void loop(){
         }
       }
     }
-  }
-}
-//--------------------------------------------------------------------------------------------------------//
-#define LEAP_YEAR(_year) ((_year%4)==0)
-static  byte monthDays[] = {31, 28, 31, 30 , 31, 30, 31, 31, 30, 31, 30, 31};
- 
-void localTime(unsigned long *timep, byte *psec, byte *pmin, byte *phour, byte *pday, byte *pwday, byte *pmonth, byte *pyear) {
-  unsigned long long epoch =* timep;
-  byte year;
-  byte month, monthLength;
-  unsigned long days;
-   
-  *psec  =  epoch % 60;
-  epoch  /= 60; // now it is minutes
-  *pmin  =  epoch % 60;
-  epoch  /= 60; // now it is hours
-  *phour =  epoch % 24;
-  epoch  /= 24; // now it is days
-  *pwday =  (epoch+4) % 7;
-   
-  year = 70;  
-  days = 0;
-  while((unsigned)(days += (LEAP_YEAR(year) ? 366 : 365)) <= epoch) { year++; }
-  *pyear=year; // *pyear is returned as years from 1900
-   
-  days  -= LEAP_YEAR(year) ? 366 : 365;
-  epoch -= days; // now it is days in this year, starting at 0
-   
-  for (month=0; month<12; month++) {
-    monthLength = ( (month==1) && LEAP_YEAR(year) ) ? 29 : monthDays[month];  // month==1 -> february
-    if (epoch >= monthLength) { epoch -= monthLength; } else { break; }
-  }
-   
-  *pmonth = month;  // jan is month 0
-  *pday   = epoch+1;  // day of month
+  } 
 }
 
-/**********************************************************************************
-**************************************** FUNÇÕES FORMATAR DATA/HORA ***************
-**********************************************************************************/
-String zero(int a){ if(a>=10) {return (String)a+"";} else { return "0"+(String)a;} }
- 
-String diaSemana(byte dia){
-  String str[] = {"Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sabado"};
-  return str[dia];
+void digitalClockDisplay(){
+  // digital clock display of the time
+  Serial.print(hour());
+  printDigits(minute());
+  printDigits(second());
+  Serial.print(" ");
+  Serial.print(day());
+  Serial.print(" ");
+  Serial.print(month());
+  Serial.print(" ");
+  Serial.print(year()); 
+  Serial.println(); 
 }
 
-void lerHoraNTP(){
-  
-  
-  //Chamar essa funcao aqui
-    if(Dns.getHostByName(host, rem_add) == 1 ){
-    Serial.println("DNS resolve...");  
-    Serial.print(host);
-    Serial.print(" = ");
-    Serial.println(rem_add);
-    sendNTPpacket(rem_add);
-  } else {
-    Serial.println("DNS fail...");
-    Serial.print("time.nist.gov = ");
-    Serial.println(timeServer); // caso a primeira tentativa não retorne um host válido
-    sendNTPpacket(timeServer);  // send an NTP packet to a time server
-  }
-   
-  delay(1000); //aguarda um segundo, para receber os dados enviados.
-   
-  if ( Udp.parsePacket() ) {  
-    // We've received a packet, read the data from it
-    Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read the packet into the buffer
-   
-    // the timestamp starts at byte 40 of the received packet and is four bytes,
-    // or two words, long. First, esxtract the two words:
-    unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-    unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);  
-     
-    // combine the four bytes (two words) into a long integer
-    // this is NTP time (seconds since Jan 1 1900):
-    unsigned long secsSince1900 = highWord << 16 | lowWord;  
-    Serial.print("Segundos desde 1 de Jan. de 1900 = " );
-    Serial.println(secsSince1900);     
-   
-    Serial.print("Unix time = ");
-    const unsigned long seventyYears = 2208988800UL;      // Unix time starts on Jan 1 1970. In seconds, that's 2208988800:
-    unsigned long epoch = secsSince1900 - seventyYears;  //desconta 70 anos
-    // print Unix time:
-    Serial.println(epoch);         
- 
-    byte ano, mes, dia, dia_semana, hora, minuto, segundo;            
-    localTime(&epoch, &segundo, &minuto, &hora, &dia, &dia_semana, &mes, &ano); //extrai data e hora do unix time
-     
-    Serial.print("Ano: ");
-    Serial.println(ano+1900);
-    Serial.print("Mes: ");
-    Serial.println(mes+1);
-    Serial.print("Dia da semana: ");
-    Serial.println(dia_semana);
-    Serial.print("Dia: ");
-    Serial.println(dia);
-    Serial.print("Hora: ");
-    Serial.println(hora);
-    Serial.print("minunto: ");
-    Serial.println(minuto);
-    Serial.print("segundo: ");
-    Serial.println(segundo);
-     
-    String s = diaSemana(dia_semana) + ", " + zero(dia) + "/" + zero(mes+1) + "/" + (ano+1900) + " " + zero(hora) + ":" + zero(minuto) + ":" + zero(segundo);
-     
-    Serial.println(s);
-    Serial.println(" ");
-  }
-   
-  delay(10000); //atualiza novamente em 10 segundos
+void printDigits(int digits){
+  // utility for digital clock display: prints preceding colon and leading 0
+  Serial.print(":");
+  if(digits < 10)
+    Serial.print('0');
+  Serial.print(digits);
 }
 
-//---------------------------------------------------------------------
+/*-------- NTP code ----------*/
 
-// send an NTP request to the time server at the given address 
-unsigned long sendNTPpacket(IPAddress& address)
+const int NTP_PACKET_SIZE = 48; // NTP time is in the first 48 bytes of message
+byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming & outgoing packets
+
+time_t getNtpTime()
+{
+  //delay(20000);
+  while (Udp.parsePacket() > 0) ; // discard any previously received packets
+  Serial.println("Transmit NTP Request");
+  sendNTPpacket(timeServer);
+  uint32_t beginWait = millis();
+  while (millis() - beginWait < 1500) {
+    int size = Udp.parsePacket();
+    if (size >= NTP_PACKET_SIZE) {
+      Serial.println("Receive NTP Response");
+      Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
+      unsigned long secsSince1900;
+      // convert four bytes starting at location 40 to a long integer
+      secsSince1900 =  (unsigned long)packetBuffer[40] << 24;
+      secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
+      secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
+      secsSince1900 |= (unsigned long)packetBuffer[43];
+      return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;
+    }
+  }
+  Serial.println("No NTP Response :-(");
+  return 0; // return 0 if unable to get the time
+}
+
+// send an NTP request to the time server at the given address
+void sendNTPpacket(IPAddress &address)
 {
   // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE); 
+  memset(packetBuffer, 0, NTP_PACKET_SIZE);
   // Initialize values needed to form NTP request
   // (see URL above for details on the packets)
   packetBuffer[0] = 0b11100011;   // LI, Version, Mode
@@ -372,17 +327,17 @@ unsigned long sendNTPpacket(IPAddress& address)
   packetBuffer[2] = 6;     // Polling Interval
   packetBuffer[3] = 0xEC;  // Peer Clock Precision
   // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12]  = 49; 
+  packetBuffer[12]  = 49;
   packetBuffer[13]  = 0x4E;
   packetBuffer[14]  = 49;
   packetBuffer[15]  = 52;
-
   // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp: 		   
+  // you can send a packet requesting a timestamp:                 
   Udp.beginPacket(address, 123); //NTP requests are to port 123
-  Udp.write(packetBuffer,NTP_PACKET_SIZE);
-  Udp.endPacket(); 
+  Udp.write(packetBuffer, NTP_PACKET_SIZE);
+  Udp.endPacket();
 }
+
 
 int lerTemperatura()
 {
@@ -435,3 +390,210 @@ String lerArffSd(){
     Serial.println("error opening test.txt");
   } 
 }
+
+void disparaComandoTomada(int id_tomada, boolean comando){
+
+    Serial.print("Id da tomada chamada  ");  
+    Serial.println(id_tomada);
+  switch(id_tomada){
+
+    //Serial.println(id_tomada);
+    case 0:
+    
+          Serial.println("Entrou na tomada1 sim");
+    if (comando) {
+          
+          digitalWrite(tomada1, HIGH);//Arduino porta digital D8=5V;
+          client.print("te1on");//Ethernet envia para Android;
+        } else {
+          digitalWrite(tomada1, LOW);//Arduino porta digital D8=5V;
+          client.print("te1off");//Ethernet envia string para Android;
+        }
+    break; 
+    
+    case 1:
+    if (comando) {
+          digitalWrite(tomada2, HIGH);//Arduino porta digital D8=5V;
+          client.print("te2on");//Ethernet envia para Android;
+        } else {
+          digitalWrite(tomada2, LOW);//Arduino porta digital D8=5V;
+          client.print("te2off");//Ethernet envia string para Android;
+        }
+    break; 
+    
+    case 2:
+    if (comando) {
+          digitalWrite(tomada3, HIGH);//Arduino porta digital D8=5V;
+          client.print("te3on");//Ethernet envia para Android;
+        } else {
+          digitalWrite(tomada3, LOW);//Arduino porta digital D8=5V;
+          client.print("te3off");//Ethernet envia string para Android;
+        }
+    break; 
+    
+    case 3:
+    if (comando) {
+          digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
+          client.print("te4on");//Ethernet envia para Android;
+        } else {
+          digitalWrite(tomada4, LOW);//Arduino porta digital D8=5V;
+          client.print("te4off");//Ethernet envia string para Android;
+        }
+    break; 
+    
+    default:
+        Serial.print("disparaComandoTomada, opcao invalida ");
+        Serial.println(comando);
+    break;
+  }
+    //client.stop();
+}
+
+void lista_programacao(){
+  Serial.println("Listando programacao");
+  for(int i = 0; i < cont_array_programar; ++i){
+    Serial.println(""); 
+    Serial.println(array_programar[i].id_tomada);
+    Serial.println(array_programar[i].comando);
+    Serial.println(array_programar[i].hora);
+    Serial.println(array_programar[i].minutos);
+  }
+}
+
+boolean executa_programacao(){
+  
+  boolean status;
+  int hora = hour();
+  int minutos = minute();
+  /*Serial.print("hora atual ");
+  Serial.print(hora);
+  Serial.print("hora funcao ");
+  Serial.println( hour());
+  Serial.print("minutos atual ");
+  Serial.print(minutos);
+  Serial.print(" funcao ");
+  Serial.println(minute());
+  
+  Serial.print("Tamanho do cont_array ");*/
+  //Serial.println(cont_array_programar);
+  for(int i = 0; i <= cont_array_programar; ++i){
+    if(array_programar[i].hora == hora){
+     Serial.println("Entrou hora hora hora");
+      if(array_programar[i].minutos <= minutos){
+        Serial.println("Entrou em minutos tambem");
+        disparaComandoTomada(array_programar[i].id_tomada, array_programar[i].comando);
+        Serial.println("Disparando Comando");
+        //Serial.print("Entrou para id ");
+        //Serial.println(array_programar[i].id_tomada);
+        
+        //Agora remove
+        status = true;      
+      }
+    }
+    else{
+      status = false;
+      //Serial.println("Nenhum Agendamento para Disparar"); 
+    }
+  }
+ return status; 
+}
+
+//Programa para desligar, True ou false
+boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos)
+{
+  
+  struct programar p;
+  p.id_tomada = id_tomada;
+  p.comando = comando;
+  p.hora = hora;
+  p.minutos = minutos;
+  //se ainda houver vaga
+  if((cont_array_programar < array_programar_size) && (verificaSeJaAgendado(p.id_tomada, p.comando)))
+  {
+    Serial.println("Inserida Programacao");
+    Serial.print(p.id_tomada);
+        Serial.print(" ");
+            Serial.print(p.comando);
+                Serial.print(" ");
+                    Serial.print(p.hora);
+                        Serial.print(" ");
+                            Serial.print(p.minutos);
+                                Serial.println(" ");
+    array_programar[cont_array_programar] = p;
+    ++cont_array_programar;
+    return true;   
+  }
+   return false;
+}
+
+boolean define_programacao_diaria(){
+  
+  
+  boolean retorno_programar;
+  boolean estado;
+
+  retorno_programar = programarTomada(0, true, 1, 15); //Tomada 1, desligar, 2 horas e 20 minutos
+  if(retorno_programar){
+    Serial.println("Programacao efetuada com sucesso.");
+    estado = true;
+  }
+  else{
+    Serial.println("Falha ao programar");
+    estado = false; 
+  }
+    
+  retorno_programar = programarTomada(1, false, 2, 20); //Tomada 2, desligar, 2 horas e 20 minutos
+  if(retorno_programar){
+    Serial.println("Programacao efetuada com sucesso.");
+    estado = true;
+  }
+  else{
+    Serial.println("Falha ao programar");
+    estado = false;
+  }
+    
+  retorno_programar = programarTomada(2, false, 6, 0); //Tomada 3, desligar, 6 horas e 0 minutos
+  if(retorno_programar){
+    Serial.println("Programacao efetuada com sucesso.");
+    estado = true;
+  }
+  else{
+    Serial.println("Falha ao programar");
+    estado = false;
+  }
+    
+  retorno_programar = programarTomada(0, true, 0, 0); //Tomada 1, desligar, 0 horas 0 minutos
+  if(retorno_programar){
+    Serial.println("Programacao efetuada com sucesso.");
+    estado = true;
+  }
+  else{
+    Serial.println("Falha ao programar");
+    estado = false;
+  }
+    
+    return estado;
+}
+
+boolean verificaSeJaAgendado(int id_tomada, boolean comando){
+  
+  for(int i = 0; i <= cont_array_programar; ++i){
+     if(array_programar[i].id_tomada == id_tomada)
+       if(array_programar[i].comando == comando)
+         return false;
+  }
+  return true; // Pode ja esta agendado, porem com outro comando
+}
+
+
+//TODO
+/*
+* Verificar a situacao de quando um agendamento ocorre e dispara um rele. Caso o mesmo tenha seu estado alterado pelo android
+* o arduino deixa de obedecer os comandos do android.(se ligado pelo arduino.. desliga pelo android.. mas nao liga mais pelo android)
+* Iniciar gravaço do arquivo arff
+* verificar o uso de variaveis para guardar o status dos reles e situacao dos agendamentos.
+* verificar sobre envio de arquivos para o android
+* verificar que cada açao deve gerar um registro no arquivo arff
+*/
+
+
