@@ -46,6 +46,7 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
                 br.close();
 
                 linha = sb.toString();
+		Log.d("RESPOSTA ", "linha");
                 Erro = false;
 
             } catch (Exception e) {
