@@ -12,27 +12,23 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.Arrays;
 
 /**
  * Created by mario on 15/09/16.
  */
-public class SwitchStateListen extends AsyncTask<String, Void, Boolean> {
+public class SwitchStateListen1 extends AsyncTask<String, String, Boolean> {
 
-    private Switch tomada1;
-    private Switch tomada2;
-    private Switch tomada3;
-    private Switch tomada4;
+    private Switch tomada;
 
-    public SwitchStateListen(Switch s1, Switch s2, Switch s3, Switch s4){
-        tomada1 = s1;
-        tomada2 = s2;
-        tomada3 = s3;
-        tomada4 = s4;
+    public SwitchStateListen1(Switch s){
+        tomada = s;
     }
 
     @Override
     protected Boolean doInBackground(String... params) {
 
+        Log.d("ENTROU", " CLASSE");
         String URL = "http://10.10.0.50/";
         String linha = "";
         Boolean Erro = true;
@@ -40,6 +36,7 @@ public class SwitchStateListen extends AsyncTask<String, Void, Boolean> {
         //if (params.length > 0)
             // faço qualquer coisa com os parâmetros
         while (true) {
+            Log.d("ENTROU", " WHILE");
             try {
 
                 Log.d("TOMADA agora ", " TESTE");
@@ -62,24 +59,59 @@ public class SwitchStateListen extends AsyncTask<String, Void, Boolean> {
                 linha = sb.toString();
 
                 Log.d("TESTANDO", linha);
-                setEstadoTomada(linha);
+                setEstadoTomada(params[0], linha);
+
 
                 Erro = false;
 
-            } catch (Exception e) {
+
+            }catch (Exception except) {
+                Log.e("TESTE ","CRASH StackTrace: "+ Arrays.toString(except.getStackTrace()));
                 Erro = true;
             }
+            /*catch (Exception e) {
+
+
+                Log.d("FALHOU"," TESTE");
+                Erro = true;
+            }*/
+
             return Erro;
-       }
+
+        }
     }
 
-    public void setEstadoTomada(String linha) {
+    public void setEstadoTomada(String id_tomada, String linha) {
 
-        Log.d("CHAMOU", " DOIDO");
-        tomada1.setChecked(linha.contains("te1on"));
-        tomada2.setChecked(linha.contains("te2on"));
-        tomada3.setChecked(linha.contains("te3on"));
-        tomada4.setChecked(linha.contains("te4on"));
+        Log.d("TESTE", " DOIDO");
+        switch(id_tomada) {
+
+            case "tomada1":
+                tomada.setChecked(linha.contains("te1on"));
+                break;
+            case "tomada2":
+                tomada.setChecked(linha.contains("te2on"));
+                break;
+            case "tomada3":
+                tomada.setChecked(linha.contains("te3on"));
+                break;
+            case "tomada4":
+                tomada.setChecked(linha.contains("te4on"));
+                break;
+        }
+        Log.d("CHEGOU", "FINAL");
+    }
+    @Override
+    protected void onProgressUpdate(String... params) {
+        Log.d("TESTE"," UPDATE");
+        // Runs on UI thread after publishProgress(Progress...) is invoked
+        // from doInBackground()
+        //return true;
     }
 
+    @Override
+    protected void onPostExecute(Boolean result) {
+        Log.d("TESTE", " EXECUTE");
+        // Runs on the UI thread after doInBackground()
+    }
 }

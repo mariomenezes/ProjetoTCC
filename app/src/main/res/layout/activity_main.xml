@@ -10,15 +10,14 @@
     tools:context="com.mmc.nanopower.MainActivity">
 
     <Switch
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Tomada 1"
         android:id="@+id/tomada_switch1"
-        android:layout_centerHorizontal="true"
         android:checked="false" />
 
     <Switch
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Tomada 2"
         android:id="@+id/tomada_switch2"
@@ -29,18 +28,18 @@
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tomada 3"
-        android:id="@+id/tomada_switch3"
-        android:layout_below="@+id/tomada_switch2"
+        android:text="Tomada 4"
+        android:id="@+id/tomada_switch4"
+        android:layout_below="@+id/tomada_switch3"
         android:layout_centerHorizontal="true"
         android:checked="false" />
 
     <Switch
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Tomada 4"
-        android:id="@+id/tomada_switch4"
-        android:layout_below="@+id/tomada_switch3"
+        android:text="Tomada 3"
+        android:id="@+id/tomada_switch3"
+        android:layout_below="@+id/tomada_switch2"
         android:layout_centerHorizontal="true"
         android:checked="false" />
 
@@ -102,13 +101,4 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Switch
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="New Switch"
-        android:id="@+id/switch_teste"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:checked="false" />
 </RelativeLayout>

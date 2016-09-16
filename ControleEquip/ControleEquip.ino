@@ -1,10 +1,3 @@
-/*
- * Time_NTP.pde
- * Example showing time sync to NTP time source
- *
- * This sketch uses the Ethernet library
- */
- 
 #include <TimeLib.h>
 #include <Ethernet.h>
 #include <EthernetUdp.h>
@@ -18,6 +11,7 @@ struct programar{
   int hora;
   int minutos;
   boolean comando; //True - liga, false - desliga
+  boolean ja_executado;
 };
 
 #define array_programar_size 8
@@ -26,29 +20,19 @@ programar array_programar[array_programar_size];
 
 int cont_array_programar = 0;
 
-//---------------Configuracao sensor temperatura LM35-----
-
 const int LM35 = A0;
-
-//-------------------Configuracao SdCard----------------------------
-
 
 #define PIN_SD_CARD 4
 File myFile;
 
-//-------------------------------------------------------------------
+IPAddress ip(10, 10, 0, 50);
 
-//byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };//MAC padrão;
+IPAddress gateway(10, 10, 0, 1); 
 
-IPAddress ip(10, 10, 0, 50);//Define o endereco IPv4(trocar final);
+IPAddress subnet(255, 255, 255, 0);
 
-IPAddress gateway(10, 10, 0, 1);      //Define o gateway
+EthernetServer server(80); 
 
-IPAddress subnet(255, 255, 255, 0); //Define a máscara de rede
-
-EthernetServer server(80); // Porta de serviço
-
-//int D2 = 2;//Arduino digital D2;
 int tomada1 = 5;//Arduino digital D5;
 int tomada2 = 6;//Arduino digital D6;
 int tomada3 = 7;//Arduino digital D7;
@@ -72,17 +56,17 @@ const int timeZone = -3; //acredito que seja essa notacao para o Brasil
 
 
 EthernetUDP Udp;
-unsigned int localPort = 8888;  // local port to listen for UDP packets
+unsigned int localPort = 8888; 
 
 void setup() 
 {
   
-  //Verificar a necessidade de persistir esses dados, pois caso o arduino desligue, tudo se perder
   for(int i = 0; i < array_programar_size; ++i){
     array_programar[i].id_tomada = -1;
     array_programar[i].hora = -1;
     array_programar[i].minutos = -1;
     array_programar[i].comando = -1;
+    array_programar[i].ja_executado = -1;
   }
   
   pinMode(tomada1, OUTPUT);
@@ -94,15 +78,15 @@ void setup()
   pinMode(PIN_SD_CARD, OUTPUT);
   
   Serial.begin(9600);
-  while (!Serial) ; // Needed for Leonardo only
+  //while (!Serial) ; // Needed for Leonardo only
   delay(250);
-  Serial.println("Hora NTP");
+//  Serial.println("Hora NTP");
   
   Ethernet.begin(mac, ip);
-  Serial.print("IP Arduino ");
-  Serial.println(Ethernet.localIP());
+  //Serial.print("IP Arduino ");
+  //Serial.println(Ethernet.localIP());
   Udp.begin(localPort);
-  Serial.println("Esperando Sincronizar NTP");
+  //Serial.println("Esperando Sincronizar NTP");
   setSyncProvider(getNtpTime);
   define_programacao_diaria();
   
@@ -118,7 +102,7 @@ void loop()
   if (timeStatus() != timeNotSet) {
     if (now() != prevDisplay) { //update the display only if time has changed
       prevDisplay = now();
-      digitalClockDisplay();  
+      //digitalClockDisplay();  
     }
   }
   
@@ -263,27 +247,27 @@ client = server.available();
   } 
 }
 
-void digitalClockDisplay(){
+//void digitalClockDisplay(){
   // digital clock display of the time
-  Serial.print(hour());
-  printDigits(minute());
-  printDigits(second());
-  Serial.print(" ");
+  //Serial.print(hour());
+  //printDigits(minute());
+  //printDigits(second());
+  /*Serial.print(" ");
   Serial.print(day());
   Serial.print(" ");
   Serial.print(month());
   Serial.print(" ");
   Serial.print(year()); 
-  Serial.println(); 
-}
+  Serial.println();*/ 
+//}
 
-void printDigits(int digits){
+//void printDigits(int digits){
   // utility for digital clock display: prints preceding colon and leading 0
-  Serial.print(":");
-  if(digits < 10)
-    Serial.print('0');
-  Serial.print(digits);
-}
+  //Serial.print(":");
+  //if(digits < 10)
+    //Serial.print('0');
+  //Serial.print(digits);
+//}
 
 /*-------- NTP code ----------*/
 
@@ -401,44 +385,52 @@ void disparaComandoTomada(int id_tomada, boolean comando){
     case 0:
     
           Serial.println("Entrou na tomada1 sim");
-    if (comando) {
-          
+    if (comando != statusT1) {
+      if(comando){
           digitalWrite(tomada1, HIGH);//Arduino porta digital D8=5V;
-          client.print("te1on");//Ethernet envia para Android;
+          statusT1 = true;
+          //client.print("te1off");//Ethernet envia string para Android;
         } else {
           digitalWrite(tomada1, LOW);//Arduino porta digital D8=5V;
-          client.print("te1off");//Ethernet envia string para Android;
+          //client.print("te1off");//Ethernet envia string para Android;
         }
+    }
     break; 
     
     case 1:
-    if (comando) {
-          digitalWrite(tomada2, HIGH);//Arduino porta digital D8=5V;
+    if (comando != statusT2) {
+      if(comando){
+          //digitalWrite(tomada2, HIGH);//Arduino porta digital D8=5V;
           client.print("te2on");//Ethernet envia para Android;
         } else {
           digitalWrite(tomada2, LOW);//Arduino porta digital D8=5V;
-          client.print("te2off");//Ethernet envia string para Android;
+          //client.print("te2off");//Ethernet envia string para Android;
         }
+    }
     break; 
     
     case 2:
-    if (comando) {
+    if (comando != statusT3) {
+      if(comando){
           digitalWrite(tomada3, HIGH);//Arduino porta digital D8=5V;
-          client.print("te3on");//Ethernet envia para Android;
+          //client.print("te3on");//Ethernet envia para Android;
         } else {
           digitalWrite(tomada3, LOW);//Arduino porta digital D8=5V;
-          client.print("te3off");//Ethernet envia string para Android;
+          //client.print("te3off");//Ethernet envia string para Android;
         }
+    }
     break; 
     
     case 3:
-    if (comando) {
+    if (comando != statusT4) {
+      if(comando){
           digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
-          client.print("te4on");//Ethernet envia para Android;
+          //client.print("te4on");//Ethernet envia para Android;
         } else {
           digitalWrite(tomada4, LOW);//Arduino porta digital D8=5V;
-          client.print("te4off");//Ethernet envia string para Android;
+          //client.print("te4off");//Ethernet envia string para Android;
         }
+    }
     break; 
     
     default:
@@ -477,17 +469,18 @@ boolean executa_programacao(){
   Serial.print("Tamanho do cont_array ");*/
   //Serial.println(cont_array_programar);
   for(int i = 0; i <= cont_array_programar; ++i){
-    if(array_programar[i].hora == hora){
-     Serial.println("Entrou hora hora hora");
-      if(array_programar[i].minutos <= minutos){
-        Serial.println("Entrou em minutos tambem");
-        disparaComandoTomada(array_programar[i].id_tomada, array_programar[i].comando);
-        Serial.println("Disparando Comando");
-        //Serial.print("Entrou para id ");
-        //Serial.println(array_programar[i].id_tomada);
+    if(array_programar[i].ja_executado == false)
+      if(array_programar[i].hora == hora){
+        //Serial.println("Entrou hora hora hora");
+        if(array_programar[i].minutos <= minutos){
+          //Serial.println("Entrou em minutos tambem");
+          disparaComandoTomada(array_programar[i].id_tomada, array_programar[i].comando);
+          //Serial.println("Disparando Comando");
+          //Serial.print("Entrou para id ");
+          //Serial.println(array_programar[i].id_tomada);
         
-        //Agora remove
-        status = true;      
+          array_programar[i].ja_executado = true;
+          status = true;      
       }
     }
     else{
@@ -499,7 +492,7 @@ boolean executa_programacao(){
 }
 
 //Programa para desligar, True ou false
-boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos)
+boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos, boolean ja_executado)
 {
   
   struct programar p;
@@ -507,10 +500,12 @@ boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos)
   p.comando = comando;
   p.hora = hora;
   p.minutos = minutos;
+  p.ja_executado = ja_executado;
   //se ainda houver vaga
-  if((cont_array_programar < array_programar_size) && (verificaSeJaAgendado(p.id_tomada, p.comando)))
-  {
-    Serial.println("Inserida Programacao");
+  
+    if((cont_array_programar < array_programar_size) && (verificaSeJaAgendado(p.id_tomada, p.comando)))
+    {
+    /*Serial.println("Inserida Programacao");
     Serial.print(p.id_tomada);
         Serial.print(" ");
             Serial.print(p.comando);
@@ -518,10 +513,10 @@ boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos)
                     Serial.print(p.hora);
                         Serial.print(" ");
                             Serial.print(p.minutos);
-                                Serial.println(" ");
-    array_programar[cont_array_programar] = p;
-    ++cont_array_programar;
-    return true;   
+                                Serial.println(" ");*/
+      array_programar[cont_array_programar] = p;
+      ++cont_array_programar;
+      return true;   
   }
    return false;
 }
@@ -532,43 +527,43 @@ boolean define_programacao_diaria(){
   boolean retorno_programar;
   boolean estado;
 
-  retorno_programar = programarTomada(0, true, 1, 15); //Tomada 1, desligar, 2 horas e 20 minutos
+  retorno_programar = programarTomada(0, true, 0, 0, false); //Tomada 1, desligar, 2 horas e 20 minutos, se ja agendado(true, falses)
   if(retorno_programar){
-    Serial.println("Programacao efetuada com sucesso.");
+    //Serial.println("Programacao efetuada com sucesso.");
     estado = true;
   }
   else{
-    Serial.println("Falha ao programar");
+    //Serial.println("Falha ao programar");
     estado = false; 
   }
     
-  retorno_programar = programarTomada(1, true, 2, 20); //Tomada 2, desligar, 2 horas e 20 minutos
+  retorno_programar = programarTomada(1, true, 2, 20, false); //Tomada 2, desligar, 2 horas e 20 minutos
   if(retorno_programar){
-    Serial.println("Programacao efetuada com sucesso.");
+    //Serial.println("Programacao efetuada com sucesso.");
     estado = true;
   }
   else{
-    Serial.println("Falha ao programar");
+    //Serial.println("Falha ao programar");
     estado = false;
   }
     
-  retorno_programar = programarTomada(2, true, 5, 50); //Tomada 3, desligar, 6 horas e 0 minutos
+  retorno_programar = programarTomada(2, true, 5, 50, false); //Tomada 3, desligar, 6 horas e 0 minutos
   if(retorno_programar){
-    Serial.println("Programacao efetuada com sucesso.");
+    //Serial.println("Programacao efetuada com sucesso.");
     estado = true;
   }
   else{
-    Serial.println("Falha ao programar");
+    //Serial.println("Falha ao programar");
     estado = false;
   }
     
-  retorno_programar = programarTomada(0, true, 0, 0); //Tomada 1, desligar, 0 horas 0 minutos
+  retorno_programar = programarTomada(3, true, 10, 0, false); //Tomada 1, desligar, 0 horas 0 minutos
   if(retorno_programar){
-    Serial.println("Programacao efetuada com sucesso.");
+    //Serial.println("Programacao efetuada com sucesso.");
     estado = true;
   }
   else{
-    Serial.println("Falha ao programar");
+    //Serial.println("Falha ao programar");
     estado = false;
   }
     

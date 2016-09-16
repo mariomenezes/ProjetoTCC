@@ -2,9 +2,7 @@ package com.mmc.nanopower;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,10 +12,12 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
-import com.mmc.nanopower.communication.SwitchStateListen;
+import com.mmc.nanopower.communication.SwitchStateListen1;
 import com.mmc.nanopower.Classification.AprioriClassifi;
-import com.mmc.nanopower.Genetic.TSP_GA;
 import com.mmc.nanopower.communication.ArduinoPostRequest;
+import com.mmc.nanopower.communication.SwitchStateListen2;
+import com.mmc.nanopower.communication.SwitchStateListen3;
+import com.mmc.nanopower.communication.SwitchStateListen4;
 
 
 //TODO provavelmente criar outra thread para verificar o estado dos botoes(dentro do onlistener nao funciona)
@@ -46,7 +46,14 @@ public class MainActivity extends AppCompatActivity {
         tomada_switch3 = (Switch) findViewById(R.id.tomada_switch3);
         tomada_switch4 = (Switch) findViewById(R.id.tomada_switch4);
 
-        new SwitchStateListen(tomada_switch1,tomada_switch2,tomada_switch3,tomada_switch4).execute();
+        new SwitchStateListen1(tomada_switch1).execute("tomada1");
+        new SwitchStateListen2(tomada_switch2).execute("tomada2");
+        new SwitchStateListen3(tomada_switch3).execute("tomada3");
+        new SwitchStateListen4(tomada_switch4).execute("tomada4");
+        //AsyncTask<String, Void, Boolean> s = new SwitchStateListen1(tomada_switch2).execute("tomada2");
+        //s.execute("tomada2");
+//        new SwitchStateListen1(tomada_switch3).execute("tomada3");
+//        new SwitchStateListen1(tomada_switch4).execute("tomada4");
 
         tomada_switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -156,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         //tomada_switch4.setChecked(true);
 
         //TSP_GA genetico = new TSP_GA(50, 100);
-//        SwitchStateListen s = new SwitchStateListen(tomada_switch1, tomada_switch2,tomada_switch3,tomada_switch4);
+//        SwitchStateListen1 s = new SwitchStateListen1(tomada_switch1, tomada_switch2,tomada_switch3,tomada_switch4);
         //s.execute("teste");
         //String stemp = s.getLinha();
         //s.setEstadoTomada(stemp);
