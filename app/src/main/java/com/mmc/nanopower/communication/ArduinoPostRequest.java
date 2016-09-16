@@ -14,6 +14,8 @@ package com.mmc.nanopower.communication;
         import org.apache.http.impl.client.DefaultHttpClient;
 
         import android.os.AsyncTask;
+        import android.util.Log;
+        import android.widget.Switch;
 
 public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
 
@@ -28,6 +30,7 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
             // faço qualquer coisa com os parâmetros
 
             try {
+                Log.d("Executando", "ARDUINO TESTE");
 
                 HttpClient client = new DefaultHttpClient();
                 HttpGet requisicao = new HttpGet();
@@ -46,7 +49,9 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
                 br.close();
 
                 linha = sb.toString();
-		Log.d("RESPOSTA ", "linha");
+
+                Log.d("RESPOSTA ", linha);
+
                 Erro = false;
 
             } catch (Exception e) {
@@ -55,4 +60,5 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
 
         return Erro;
     }
+
 }

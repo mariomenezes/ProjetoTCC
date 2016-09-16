@@ -586,14 +586,5 @@ boolean verificaSeJaAgendado(int id_tomada, boolean comando){
 }
 
 
-//TODO
-/*
-* Verificar a situacao de quando um agendamento ocorre e dispara um rele. Caso o mesmo tenha seu estado alterado pelo android
-* o arduino deixa de obedecer os comandos do android.(se ligado pelo arduino.. desliga pelo android.. mas nao liga mais pelo android)
-* Iniciar gravaço do arquivo arff
-* verificar o uso de variaveis para guardar o status dos reles e situacao dos agendamentos.
-* verificar sobre envio de arquivos para o android
-* verificar que cada açao deve gerar um registro no arquivo arff
-*/
 
 

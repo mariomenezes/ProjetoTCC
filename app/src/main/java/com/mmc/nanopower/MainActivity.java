@@ -8,14 +8,19 @@ import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.mmc.nanopower.communication.SwitchStateListen;
 import com.mmc.nanopower.Classification.AprioriClassifi;
 import com.mmc.nanopower.Genetic.TSP_GA;
 import com.mmc.nanopower.communication.ArduinoPostRequest;
+
+
+//TODO provavelmente criar outra thread para verificar o estado dos botoes(dentro do onlistener nao funciona)
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch tomada_switch2;
     private Switch tomada_switch3;
     private Switch tomada_switch4;
+    private Switch switch_teste;
     private Button connect_button;
 
     @Override
@@ -34,24 +40,31 @@ public class MainActivity extends AppCompatActivity {
         //TODO test apriori
         new AprioriClassifi().execute();
 
+
         tomada_switch1 = (Switch) findViewById(R.id.tomada_switch1);
+        tomada_switch2 = (Switch) findViewById(R.id.tomada_switch2);
+        tomada_switch3 = (Switch) findViewById(R.id.tomada_switch3);
+        tomada_switch4 = (Switch) findViewById(R.id.tomada_switch4);
+
+        new SwitchStateListen(tomada_switch1,tomada_switch2,tomada_switch3,tomada_switch4).execute();
 
         tomada_switch1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-
                 if(isChecked){
                    new ArduinoPostRequest().execute("t1high");
                 }else{
                     new ArduinoPostRequest().execute("t1low");
                 }
 
-            }
+                }
+
         });
 
-        tomada_switch2 = (Switch) findViewById(R.id.tomada_switch2);
+
 
         tomada_switch2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -68,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        tomada_switch3 = (Switch) findViewById(R.id.tomada_switch3);
 
         tomada_switch3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -85,9 +97,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        tomada_switch4 = (Switch) findViewById(R.id.tomada_switch4);
 
         tomada_switch4.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+
 
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
@@ -102,48 +115,63 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        switch_teste = (Switch) findViewById(R.id.switch_teste);
+
+        switch_teste.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+
+
+                if(isChecked){
+                    Log.d("BOTAO", "ativado");
+                }else{
+                    Log.d("BOTAO", "desativado");
+                }
+
+            }
+        });
+
         connect_button = (Button) findViewById(R.id.button_connect);
 
         connect_button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-
-                //TODO
-
-            }
-
-        });
+                Log.d("CLICOU", " teste");
 
 
-        TSP_GA genetico = new TSP_GA(50, 100);
-
-    }
-
-    public void addListenerOnButton() {
-
-        Button button = (Button) findViewById(R.id.button_connect);
-
-        button.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View arg0) {
-
-                Intent browserIntent =
-                        new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.mkyong.com"));
-                startActivity(browserIntent);
 
             }
 
         });
 
+
+        //ArduinoPostRequest a = new ArduinoPostRequest();
+       // boolean b[] = a.getEstadoTomadas();
+        //tomada_switch1.setChecked(true);
+        //tomada_switch2.setChecked(true);
+        //tomada_switch3.setChecked(true);
+        //tomada_switch4.setChecked(true);
+
+        //TSP_GA genetico = new TSP_GA(50, 100);
+//        SwitchStateListen s = new SwitchStateListen(tomada_switch1, tomada_switch2,tomada_switch3,tomada_switch4);
+        //s.execute("teste");
+        //String stemp = s.getLinha();
+        //s.setEstadoTomada(stemp);
+
+
     }
+
 
     // Storage Permissions variables
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
+
+
     };
 
     //persmission method.
@@ -160,5 +188,8 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_EXTERNAL_STORAGE
             );
         }
+
     }
+
+
 }
