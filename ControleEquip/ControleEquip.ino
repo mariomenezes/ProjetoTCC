@@ -3,7 +3,7 @@
 #include <EthernetUdp.h>
 #include <SPI.h>
 #include <SD.h>
-
+#include <stdlib.h>
 //----------array para programacao de eventos-----------
 
 struct programar{
@@ -21,6 +21,12 @@ programar array_programar[array_programar_size];
 int cont_array_programar = 0;
 
 const int LM35 = A0;
+const int LDR = A1;
+//TODO verificar isso aqui, A4 acho que esta sendo usado SD
+const int S1 = A2;
+const int S2 = A3;
+const int S3 = A5;
+const int S4 = A6;
 
 #define PIN_SD_CARD 4
 File myFile;
@@ -322,15 +328,93 @@ void sendNTPpacket(IPAddress &address)
   Udp.endPacket();
 }
 
-
-int lerTemperatura()
+float lerQtdLuz()
 {
-  int temperatura = ((int)analogRead(LM35)*5/(1023))/0.01;
+  float luz = (float)analogRead(LDR);
+  return luz;  
+}
+
+float lerTemperatura()
+{
+  float temperatura = ((float)analogRead(LM35)*5/(1023))/0.01;
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
   return temperatura; 
 }
+//DOING
+float lerConsumoT1(){
+    int sensor = analogRead(S1);
+    float output =   map(sensor, 0, 1023, -30, 30);
+    return output;
+}
 
+float lerConsumoT2(){
+    int sensor = analogRead(S2);
+    float output =   map(sensor, 0, 1023, -30, 30);
+    return output;
+}
+
+float lerConsumoT3(){
+    int sensor = analogRead(S3);
+    float output =   map(sensor, 0, 1023, -30, 30);
+    return output;
+}
+
+float lerConsumoT4(){
+    int sensor = analogRead(S4);
+    float output =   map(sensor, 0, 1023, -30, 30);
+    return output;
+}
+
+//DOING
+// estado tomadas, temp, luz, data, hora, consumo 
+boolean registraEventoArffSd()
+{
+  boolean error;
+  char buff[20];  
+  //status das tomadas
+  String t1, t2, t3, t4;
+  t1 = (statusT1)?"on":"off";
+  t2 = (statusT2)?"on":"off";
+  t3 = (statusT3)?"on":"off";
+  t4 = (statusT4)?"on":"off";
+  
+  //status temperatura
+  float t = lerTemperatura();
+  
+  //Sensor de Luz
+  float l = lerQtdLuz();
+  
+  if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    //return;
+    error = true;
+  }
+  Serial.println("initialization done.");
+  
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  myFile = SD.open("base.ARFF", FILE_WRITE);
+  
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to test.txt...");
+    myFile.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 2, buff) 
+                    +","+ dtostrf(l, 0, 2, buff) +","+ dtostrf(day(), 0, 2, buff) +","
+                    + dtostrf(month(), 0, 2, buff) +","+ dtostrf(year(), 0, 2, buff) +","
+                    + dtostrf(hour(), 0, 2, buff) +","+ dtostrf(minute(), 0, 2, buff));
+                    
+    // close the file:
+    myFile.close();
+    Serial.println("done.");
+    error = false;
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening test.txt");
+    error = true;
+  }  
+  return !error;
+}
 void escreveArffSd(){
   if (!SD.begin(4)) {
     Serial.println("initialization failed!");
