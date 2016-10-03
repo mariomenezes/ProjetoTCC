@@ -115,7 +115,8 @@ void loop()
 //  client = server.available();
 
   controleTomadas();
-  executa_programacao();
+  //TODO verificar depois se a opço de programacao sera mantida
+  //executa_programacao();
   //lista_programacao();
   
   //delay(2000);
@@ -152,6 +153,7 @@ client = server.available();
             // O Led vai ser ligado
             digitalWrite(tomada1, HIGH);//Arduino porta digital D5=5V;
             statusT1 = true;
+            registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
           if(readString.indexOf("t1low")>=0)//Recebido do Android;
@@ -159,6 +161,7 @@ client = server.available();
             // O Led vai ser desligado
             digitalWrite(tomada1, LOW);//Arduino porta digital D5=0V;
             statusT1 = false;
+            registraEventoArffSd();
           }
 //------------------------------------------------------------------   
           
@@ -167,6 +170,7 @@ client = server.available();
             // O Led vai ser ligado
             digitalWrite(tomada2, HIGH);//Arduino porta digital D6=5V;
             statusT2 = true;
+            registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
           if(readString.indexOf("t2low")>=0)//Recebido do Android;
@@ -174,6 +178,7 @@ client = server.available();
             // O Led vai ser desligado
             digitalWrite(tomada2, LOW);//Arduino porta digital D6=0V;
             statusT2 = false;
+            registraEventoArffSd();
           }
 //------------------------------------------------------------------        
           if(readString.indexOf("t3high")>=0)//Recebido do Android;
@@ -181,6 +186,7 @@ client = server.available();
             // O Led vai ser ligado
             digitalWrite(tomada3, HIGH);//Arduino porta digital D7=5V;
             statusT3 = true;
+            registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
           if(readString.indexOf("t3low")>=0)//Recebido do Android;
@@ -188,6 +194,7 @@ client = server.available();
             // O Led vai ser desligado
             digitalWrite(tomada3, LOW);//Arduino porta digital D7=0V;
             statusT3 = false;
+            registraEventoArffSd();
           }
 //------------------------------------------------------------------        
           if(readString.indexOf("t4high")>=0)//Recebido do Android;
@@ -195,6 +202,7 @@ client = server.available();
             // O Led vai ser ligado
             digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
             statusT4 = true;
+            registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
           if(readString.indexOf("t4low")>=0)//Recebido do Android;
@@ -202,6 +210,7 @@ client = server.available();
             // O Led vai ser desligado
             digitalWrite(tomada4, LOW);//Arduino porta digital D8=0V;
             statusT4 = false;
+            registraEventoArffSd();
           } 
 //------------------------------------------------------------------         
         // dados HTML de saída começando com cabeçalho padrão
@@ -374,10 +383,16 @@ boolean registraEventoArffSd()
   char buff[20];  
   //status das tomadas
   String t1, t2, t3, t4;
+  float c1, c2, c3, c4;
   t1 = (statusT1)?"on":"off";
   t2 = (statusT2)?"on":"off";
   t3 = (statusT3)?"on":"off";
   t4 = (statusT4)?"on":"off";
+  
+  c1 = lerConsumoT1();
+  c2 = lerConsumoT2();
+  c3 = lerConsumoT3();
+  c4 = lerConsumoT4();
   
   //status temperatura
   float t = lerTemperatura();
@@ -396,13 +411,16 @@ boolean registraEventoArffSd()
   // so you have to close this one before opening another.
   myFile = SD.open("base.ARFF", FILE_WRITE);
   
+  //Weekday sunday = 1
   // if the file opened okay, write to it:
   if (myFile) {
     Serial.print("Writing to test.txt...");
     myFile.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 2, buff) 
-                    +","+ dtostrf(l, 0, 2, buff) +","+ dtostrf(day(), 0, 2, buff) +","
+                    +","+ dtostrf(l, 0, 2, buff) +","+ dtostrf(weekday(), 0, 2, buff) +","
                     + dtostrf(month(), 0, 2, buff) +","+ dtostrf(year(), 0, 2, buff) +","
-                    + dtostrf(hour(), 0, 2, buff) +","+ dtostrf(minute(), 0, 2, buff));
+                    + dtostrf(hour(), 0, 2, buff) +","+ dtostrf(minute(), 0, 2, buff)
+                    + "," + dtostrf(c1, 0, 2, buff) + "," + dtostrf(c2, 0, 2, buff)
+                    + "," + dtostrf(c3, 0, 2, buff) + "," + dtostrf(c4, 0, 2, buff));
                     
     // close the file:
     myFile.close();

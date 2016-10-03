@@ -1,0 +1,20 @@
+@relation 	automacao
+
+@attribute statusT1 {on, off}
+@attribute statusT2 {on, off}
+@attribute statusT3 {on, off}
+@attribute statusT4 {on, off}
+@attribute temperature real
+@attribute lightLevel real
+@attribute day {1,2,3,4,5,6,7}
+@attribute month {1,2,3,4,5,6,7,8,9,10,11,12}
+@attribute hour real
+@attribute minute real
+@attribute consumption1 real
+@attribute consumption2 real
+@attribute consumption3 real
+@attribute consumption4 real
+
+@data
+
+
