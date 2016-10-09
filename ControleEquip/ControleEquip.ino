@@ -66,6 +66,10 @@ unsigned int localPort = 8888;
 
 void setup() 
 {
+  pinMode(LM35, INPUT);  // configura como entrada
+  digitalWrite(LM35, LOW);  // desabilita resistores de pull-up
+  pinMode(LDR, INPUT);  // configura como entrada
+  digitalWrite(LDR, LOW);  // desabilita resistores de pull-up
   
   for(int i = 0; i < array_programar_size; ++i){
     array_programar[i].id_tomada = -1;
@@ -114,13 +118,16 @@ void loop()
   
 //  client = server.available();
 
-  controleTomadas();
+  //controleTomadas();
   //TODO verificar depois se a opço de programacao sera mantida
   //executa_programacao();
   //lista_programacao();
   
   //delay(2000);
-
+  lerTemperatura();
+  
+  lerQtdLuz();
+  
 }
 
 EthernetClient client;
@@ -339,13 +346,26 @@ void sendNTPpacket(IPAddress &address)
 
 float lerQtdLuz()
 {
-  float luz = (float)analogRead(LDR);
-  return luz;  
+  delay(2000);
+  float sensor = 0;
+  
+  for(int i = 0; i < 10; ++i)
+    sensor += (float)analogRead(LDR);
+  sensor /= 10;
+  float output = map(sensor, 0, 1023, 100, 0);
+  Serial.print("Luz: ");
+  Serial.print(output);
+  Serial.println(" %");
+  return output;  
 }
 
 float lerTemperatura()
 {
-  float temperatura = ((float)analogRead(LM35)*5/(1023))/0.01;
+  delay(2000);
+  float temperatura = 0;
+  for(int i = 0; i < 20; ++i) 
+    temperatura += ((float)analogRead(LM35)*5/(1023))/0.01;
+  temperatura /= 20;
   Serial.print("Temperatura: ");
   Serial.println(temperatura);
   return temperatura; 
