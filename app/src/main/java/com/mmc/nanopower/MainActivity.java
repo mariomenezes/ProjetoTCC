@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        switch_teste = (Switch) findViewById(R.id.switch_teste);
+        /*switch_teste = (Switch) findViewById(R.id.switch_teste);
 
         switch_teste.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
+*/
         connect_button = (Button) findViewById(R.id.button_connect);
 
         connect_button.setOnClickListener(new View.OnClickListener() {
