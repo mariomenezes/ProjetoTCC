@@ -1,0 +1,6 @@
+on,off,off,off,33.28,3.00,5.00,10.00,2016.00,21.00,58.00
+
+Transmit NTP Request
+
+Receive NTP Response
+

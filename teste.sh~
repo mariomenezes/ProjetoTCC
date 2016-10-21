@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while 1
+do
+    cat /dev/ttyACM0 >> log.txt
+done
+
+
