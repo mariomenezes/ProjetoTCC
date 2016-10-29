@@ -4,23 +4,23 @@
 #include <Ethernet.h>
 #include <EthernetUdp.h>
 #include <SPI.h>
-#include <SdFat.h>
-#include <stdlib.h>
+//#include <SdFat.h>
+//#include <stdlib.h>
 //----------array para programacao de eventos-----------
 
-struct programar{
-  int  id_tomada; 
-  int hora;
-  int minutos;
-  boolean comando; //True - liga, false - desliga
-  boolean ja_executado;
-};
+/*struct programar{
+ int  id_tomada; 
+ int hora;
+ int minutos;
+ boolean comando; //True - liga, false - desliga
+ boolean ja_executado;
+ };*/
+//
+//#define array_programar_size 8
 
-#define array_programar_size 8
+//programar array_programar[array_programar_size];
 
-programar array_programar[array_programar_size];
-
-int cont_array_programar = 0;
+//int cont_array_programar = 0;
 
 const int LM35 = A0;
 const int LDR = A1;
@@ -78,13 +78,13 @@ void setup()
   pinMode(LDR, INPUT);  // configura como entrada
   digitalWrite(LDR, LOW);  // desabilita resistores de pull-up
 
-  for(int i = 0; i < array_programar_size; ++i){
-    array_programar[i].id_tomada = -1;
-    array_programar[i].hora = -1;
-    array_programar[i].minutos = -1;
-    array_programar[i].comando = -1;
-    array_programar[i].ja_executado = -1;
-  }
+  /*for(int i = 0; i < array_programar_size; ++i){
+   array_programar[i].id_tomada = -1;
+   array_programar[i].hora = -1;
+   array_programar[i].minutos = -1;
+   array_programar[i].comando = -1;
+   array_programar[i].ja_executado = -1;
+   }*/
 
   pinMode(tomada1, OUTPUT);
   pinMode(tomada2, OUTPUT);
@@ -93,41 +93,41 @@ void setup()
 
   // Seta porta SdCard
   //pinMode(PIN_SD_CARD, OUTPUT);
-  
+
   Serial.begin(9600);
-//  while (!Serial) {}  // wait for Leonardo
-//  Serial.println("Type any character to start");
-//  while (Serial.read() <= 0) {}
+  //  while (!Serial) {}  // wait for Leonardo
+  //  Serial.println("Type any character to start");
+  //  while (Serial.read() <= 0) {}
   delay(400);  // catch Due reset problem
-  
+
   // Initialize SdFat or print a detailed error message and halt
   // Use half speed like the native library.
   // change to SPI_FULL_SPEED for more performance.
   //if (!sd.begin(chipSelect, SPI_HALF_SPEED)) sd.initErrorHalt();
 
   // open the file for write at end like the Native SD library
-//  if (!myFile.open("test.txt", O_RDWR | O_CREAT | O_AT_END)) {
-//    sd.errorHalt("opening test.txt for write failed");
-//  }
-//  // if the file opened okay, write to it:
-//  Serial.print("Arduino Iniciou gravacao");
-//  myFile.println("Arduino Iniciou gravacao");
-//
-//  // close the file:
-//  myFile.close();
-//  Serial.println("done.");
-//  
-//  // re-open the file for reading:
-//  if (!myFile.open("test.txt", O_READ)) {
-//    sd.errorHalt("opening test.txt for read failed");
-//  }
-//  Serial.println("test.txt:");
-//
-//  // read from the file until there's nothing else in it:
-//  int data;
-//  while ((data = myFile.read()) >= 0) Serial.write(data);
-//  // close the file:
-//  myFile.close();
+  //  if (!myFile.open("test.txt", O_RDWR | O_CREAT | O_AT_END)) {
+  //    sd.errorHalt("opening test.txt for write failed");
+  //  }
+  //  // if the file opened okay, write to it:
+  //  Serial.print("Arduino Iniciou gravacao");
+  //  myFile.println("Arduino Iniciou gravacao");
+  //
+  //  // close the file:
+  //  myFile.close();
+  //  Serial.println("done.");
+  //  
+  //  // re-open the file for reading:
+  //  if (!myFile.open("test.txt", O_READ)) {
+  //    sd.errorHalt("opening test.txt for read failed");
+  //  }
+  //  Serial.println("test.txt:");
+  //
+  //  // read from the file until there's nothing else in it:
+  //  int data;
+  //  while ((data = myFile.read()) >= 0) Serial.write(data);
+  //  // close the file:
+  //  myFile.close();
 
   Ethernet.begin(mac, ip);
   //Serial.print("IP Arduino ");
@@ -135,25 +135,25 @@ void setup()
   Udp.begin(localPort);
   //Serial.println("Esperando Sincronizar NTP");
   setSyncProvider(getNtpTime);
-  define_programacao_diaria();
-  
-  
+  //define_programacao_diaria();
+
+
 
 }
 
-time_t prevDisplay = 0; // when the digital clock was displayed
+//time_t prevDisplay = 0; // when the digital clock was displayed
 
 
 //EthernetClient client;
 
 void loop()
 {  
-  if (timeStatus() != timeNotSet) {
-    if (now() != prevDisplay) { //update the display only if time has changed
-      prevDisplay = now();
-     // digitalClockDisplay();  
-    }
-  }
+  //if (timeStatus() != timeNotSet) {
+  // if (now() != prevDisplay) { //update the display only if time has changed
+  // prevDisplay = now();
+  // digitalClockDisplay();  
+  //}
+  //}
 
   //  client = server.available();
 
@@ -165,7 +165,7 @@ void loop()
   //delay(2000);
   //lerTemperatura();
 
-//  lerQtdLuz();
+  //Serial.println(lerQtdLuz());
 
 }
 
@@ -191,9 +191,16 @@ void controleTomadas(){
         //se o pedido HTTP terminou
         if (c == '\n')
         {
+          //testando nessa posicao
+          client.println("HTTP/1.1 200 OK");
+          client.println("Content-Type: text/html");
+          client.println();      
+          client.print("<font size='20'>");
+          client.println("</html>");
+          
           //Serial.println("Entrou");
           //------------------------------------------------------------------        
-          if(readString.indexOf("t1high")>=0)//Recebido do Android;
+          if(readString.indexOf("t1h")>=0)//Recebido do Android;
           {
             //Serial.println("Entrou1");
             // O Led vai ser ligado
@@ -202,7 +209,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
-          if(readString.indexOf("t1low")>=0)//Recebido do Android;
+          else if(readString.indexOf("t1l")>=0)//Recebido do Android;
           {
             // O Led vai ser desligado
             digitalWrite(tomada1, LOW);//Arduino porta digital D5=0V;
@@ -211,7 +218,7 @@ void controleTomadas(){
           }
           //------------------------------------------------------------------   
 
-          if(readString.indexOf("t2high")>=0)//Recebido do Android;
+          else if(readString.indexOf("t2h")>=0)//Recebido do Android;
           {
             // O Led vai ser ligado
             digitalWrite(tomada2, HIGH);//Arduino porta digital D6=5V;
@@ -219,7 +226,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
-          if(readString.indexOf("t2low")>=0)//Recebido do Android;
+          else if(readString.indexOf("t2l")>=0)//Recebido do Android;
           {
             // O Led vai ser desligado
             digitalWrite(tomada2, LOW);//Arduino porta digital D6=0V;
@@ -227,7 +234,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           //------------------------------------------------------------------        
-          if(readString.indexOf("t3high")>=0)//Recebido do Android;
+          else if(readString.indexOf("t3h")>=0)//Recebido do Android;
           {
             // O Led vai ser ligado
             digitalWrite(tomada3, HIGH);//Arduino porta digital D7=5V;
@@ -235,7 +242,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
-          if(readString.indexOf("t3low")>=0)//Recebido do Android;
+          else if(readString.indexOf("t3l")>=0)//Recebido do Android;
           {
             // O Led vai ser desligado
             digitalWrite(tomada3, LOW);//Arduino porta digital D7=0V;
@@ -243,7 +250,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           //------------------------------------------------------------------        
-          if(readString.indexOf("t4high")>=0)//Recebido do Android;
+          else if(readString.indexOf("t4h")>=0)//Recebido do Android;
           {
             // O Led vai ser ligado
             digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
@@ -251,7 +258,7 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
-          if(readString.indexOf("t4low")>=0)//Recebido do Android;
+          else if(readString.indexOf("t4l")>=0)//Recebido do Android;
           {
             // O Led vai ser desligado
             digitalWrite(tomada4, LOW);//Arduino porta digital D8=0V;
@@ -260,50 +267,51 @@ void controleTomadas(){
           } 
           //------------------------------------------------------------------         
           // dados HTML de saída começando com cabeçalho padrão
-          client.println("HTTP/1.1 200 OK");
-          client.println("Content-Type: text/html");
-          client.println();      
-          client.print("<font size='20'>");
+//          client.println("HTTP/1.1 200 OK");
+//          client.println("Content-Type: text/html");
+//          client.println();      
+//          client.print("<font size='20'>");
+//          client.println("</html>");
           //------------------------------------------------------------------ 
           if (statusT1) {
-            client.print("te1on");//Ethernet envia para Android;
+            client.print("t1o");//Ethernet envia para Android;
             //String apenas letras;
           } 
           else {
-            client.print("te1off");//Ethernet envia string para Android;
+            client.print("t1f");//Ethernet envia string para Android;
             //String apenas letras;
           }
           //------------------------------------------------------------------ 
           if (statusT2) {
-            client.print("te2on");//Ethernet envia para Android;
+            client.print("t2o");//Ethernet envia para Android;
             //String apenas letras;
           } 
           else {
-            client.print("te2off");//Ethernet envia string para Android;
+            client.print("t2f");//Ethernet envia string para Android;
             //String apenas letras;
           }
           //------------------------------------------------------------------ 
           if (statusT3) {
-            client.print("te3on");//Ethernet envia para Android;
+            client.print("t3o");//Ethernet envia para Android;
             //String apenas letras;
           } 
           else {
-            client.print("te3off");//Ethernet envia string para Android;
+            client.print("t3f");//Ethernet envia string para Android;
             //String apenas letras;
           }
           //------------------------------------------------------------------ 
           if (statusT4) {
-            client.print("te4on");//Ethernet envia para Android;
+            client.print("t4o");//Ethernet envia para Android;
             //String apenas letras;
           } 
           else {
-            client.print("te4off");//Ethernet envia string para Android;
+            client.print("t4f");//Ethernet envia string para Android;
             //String apenas letras;
           }
           //------------------------------------------------------------------ 
           //limpa string para a próxima leitura
           readString="";
-
+          client.println("</html>");
           // parar cliente
           client.stop();
         }
@@ -387,56 +395,56 @@ void sendNTPpacket(IPAddress &address)
   Udp.endPacket();
 }
 
-float lerQtdLuz()
+int lerQtdLuz()
 {
   delay(2000);
-  float sensor = 0;
+  int sensor = 0;
 
   for(int i = 0; i < 10; ++i)
     sensor += (float)analogRead(LDR);
   sensor /= 10;
-  float output = map(sensor, 0, 1023, 100, 0);
+  int output = map(sensor, 0, 1023, 100, 0);
   //Serial.print("Luz: ");
   //Serial.print(output);
   //Serial.println(" %");
   return output;  
 }
 
-float lerTemperatura()
+int lerTemperatura()
 {
   delay(2000);
-  float temperatura = 0;
-  for(int i = 0; i < 20; ++i) 
+  int temperatura = 0;
+  for(int i = 0; i < 30; ++i) 
     temperatura += ((float)analogRead(LM35)*5/(1023))/0.01;
-  temperatura /= 20;
+  temperatura /= 30;
   //Serial.print("Temperatura: ");
   //Serial.println(temperatura);
   return temperatura; 
 }
 //DOING
 /*float lerConsumoT1(){
-  int sensor = analogRead(S1);
-  float output =   map(sensor, 0, 1023, -30, 30);
-  return output;
-}
-
-float lerConsumoT2(){
-  int sensor = analogRead(S2);
-  float output =   map(sensor, 0, 1023, -30, 30);
-  return output;
-}
-
-float lerConsumoT3(){
-  int sensor = analogRead(S3);
-  float output =   map(sensor, 0, 1023, -30, 30);
-  return output;
-}
-
-float lerConsumoT4(){
-  int sensor = analogRead(S4);
-  float output =   map(sensor, 0, 1023, -30, 30);
-  return output;
-}*/
+ int sensor = analogRead(S1);
+ float output =   map(sensor, 0, 1023, -30, 30);
+ return output;
+ }
+ 
+ float lerConsumoT2(){
+ int sensor = analogRead(S2);
+ float output =   map(sensor, 0, 1023, -30, 30);
+ return output;
+ }
+ 
+ float lerConsumoT3(){
+ int sensor = analogRead(S3);
+ float output =   map(sensor, 0, 1023, -30, 30);
+ return output;
+ }
+ 
+ float lerConsumoT4(){
+ int sensor = analogRead(S4);
+ float output =   map(sensor, 0, 1023, -30, 30);
+ return output;
+ }*/
 
 //DOING
 // estado tomadas, temp, luz, data, hora, consumo 
@@ -450,39 +458,36 @@ void registraEventoArffSd()
   char buff4[20];
   char buff5[20];
   char buff6[20];
-      
+
   //status das tomadas
   String t1, t2, t3, t4;
-  float c1, c2, c3, c4;
-  t1 = (statusT1)?"on":"off";
-  t2 = (statusT2)?"on":"off";
-  t3 = (statusT3)?"on":"off";
-  t4 = (statusT4)?"on":"off";
-
-  /*c1 = lerConsumoT1();
-  c2 = lerConsumoT2();
-  c3 = lerConsumoT3();
-  c4 = lerConsumoT4();*/
+  //int c1, c2, c3, c4;
+  t1 = (statusT1)?"o":"f";
+  t2 = (statusT2)?"o":"f";
+  t3 = (statusT3)?"o":"f";
+  t4 = (statusT4)?"o":"f";
 
   //status temperatura
-  float t = lerTemperatura();
+  int t = lerTemperatura();
+
+  //Serial.println(t);
 
   //Sensor de Luz
-  float l = lerQtdLuz();
+  int l = lerQtdLuz();
 
-//  if (!SD.begin(4)) {
-//    Serial.println("initialization failed!");
-//    //return;
-//    //error = true;
-//  }
-//  Serial.println("initialization done.");
+  //  if (!SD.begin(4)) {
+  //    Serial.println("initialization failed!");
+  //    //return;
+  //    //error = true;
+  //  }
+  //  Serial.println("initialization done.");
 
-//if(!sdCard.begin(PIN_SD_CARD,SPI_HALF_SPEED))sdCard.initErrorHalt();
-//  // Abre o arquivo LER_POT.TXT
-//  if (!myFile.open("test.txt", O_RDWR | O_CREAT | O_AT_END))
-//  {
-//    sdCard.errorHalt("Erro na abertura do arquivo BASE.ARFF!");
-//  }
+  //if(!sdCard.begin(PIN_SD_CARD,SPI_HALF_SPEED))sdCard.initErrorHalt();
+  //  // Abre o arquivo LER_POT.TXT
+  //  if (!myFile.open("test.txt", O_RDWR | O_CREAT | O_AT_END))
+  //  {
+  //    sdCard.errorHalt("Erro na abertura do arquivo BASE.ARFF!");
+  //  }
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
@@ -491,23 +496,23 @@ void registraEventoArffSd()
   //Weekday sunday = 1
   // if the file opened okay, write to it:
   //if (myFile) {
-//    Serial.print("Writing to base.ARFF...");
-    Serial.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 2, buff0) 
-      +","+ dtostrf(l, 0, 2, buff1) +","+ dtostrf(weekday(), 0, 0, buff2) +","
-      + dtostrf(month(), 0, 0, buff3) +","+ dtostrf(year(), 0, 0, buff4) +","
-      + dtostrf(hour(), 0, 0, buff5) +","+ dtostrf(minute(), 0, 0, buff6));
- //     + "," + dtostrf(c1, 0, 2, buff) + "," + dtostrf(c2, 0, 2, buff)
-   //   + "," + dtostrf(c3, 0, 2, buff) + "," + dtostrf(c4, 0, 2, buff));
+  //    Serial.print("Writing to base.ARFF...");
+  Serial.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 0, buff0) 
+    +","+ dtostrf(l, 0, 0, buff1) +","+ dtostrf(weekday(), 0, 0, buff2) +","
+    + dtostrf(month(), 0, 0, buff3) +","+ dtostrf(year(), 0, 0, buff4) +","
+    + dtostrf(hour(), 0, 0, buff5) +","+ dtostrf(minute(), 0, 0, buff6));
+  //     + "," + dtostrf(c1, 0, 2, buff) + "," + dtostrf(c2, 0, 2, buff)
+  //   + "," + dtostrf(c3, 0, 2, buff) + "," + dtostrf(c4, 0, 2, buff));
 
-    // close the file:
-    //myFile.close();
-    //Serial.println("done.");
-    //error = false;
+  // close the file:
+  //myFile.close();
+  //Serial.println("done.");
+  //error = false;
   //} 
-//else {
-    // if the file didn't open, print an error:
- //   Serial.println("error opening base.ARFF");
-    //error = true;
+  //else {
+  // if the file didn't open, print an error:
+  //   Serial.println("error opening base.ARFF");
+  //error = true;
   //}  
   //return !error;
 }
@@ -557,214 +562,198 @@ void registraEventoArffSd()
 //  } 
 //}
 
-void disparaComandoTomada(int id_tomada, boolean comando){
+/*void disparaComandoTomada(int id_tomada, boolean comando){
+ 
+ Serial.print("Id da tomada chamada  ");  
+ Serial.println(id_tomada);
+ switch(id_tomada){
+ 
+ //Serial.println(id_tomada);
+ case 0:
+ 
+ Serial.println("Entrou na tomada1 sim");
+ if (comando != statusT1) {
+ if(comando){
+ digitalWrite(tomada1, HIGH);//Arduino porta digital D8=5V;
+ statusT1 = true;
+ //client.print("te1off");//Ethernet envia string para Android;
+ } 
+ else {
+ digitalWrite(tomada1, LOW);//Arduino porta digital D8=5V;
+ //client.print("te1off");//Ethernet envia string para Android;
+ }
+ }
+ break; 
+ 
+ case 1:
+ if (comando != statusT2) {
+ if(comando){
+ //digitalWrite(tomada2, HIGH);//Arduino porta digital D8=5V;
+ client.print("te2on");//Ethernet envia para Android;
+ } 
+ else {
+ digitalWrite(tomada2, LOW);//Arduino porta digital D8=5V;
+ //client.print("te2off");//Ethernet envia string para Android;
+ }
+ }
+ break; 
+ 
+ case 2:
+ if (comando != statusT3) {
+ if(comando){
+ digitalWrite(tomada3, HIGH);//Arduino porta digital D8=5V;
+ //client.print("te3on");//Ethernet envia para Android;
+ } 
+ else {
+ digitalWrite(tomada3, LOW);//Arduino porta digital D8=5V;
+ //client.print("te3off");//Ethernet envia string para Android;
+ }
+ }
+ break; 
+ 
+ case 3:
+ if (comando != statusT4) {
+ if(comando){
+ digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
+ //client.print("te4on");//Ethernet envia para Android;
+ } 
+ else {
+ digitalWrite(tomada4, LOW);//Arduino porta digital D8=5V;
+ //client.print("te4off");//Ethernet envia string para Android;
+ }
+ }
+ break; 
+ 
+ default:
+ Serial.print("disparaComandoTomada, opcao invalida ");
+ Serial.println(comando);
+ break;
+ }
+ //client.stop();
+ }
+ */
 
-  Serial.print("Id da tomada chamada  ");  
-  Serial.println(id_tomada);
-  switch(id_tomada){
+/*void lista_programacao(){
+ Serial.println("Listando programacao");
+ for(int i = 0; i < cont_array_programar; ++i){
+ Serial.println(""); 
+ Serial.println(array_programar[i].id_tomada);
+ Serial.println(array_programar[i].comando);
+ Serial.println(array_programar[i].hora);
+ Serial.println(array_programar[i].minutos);
+ }
+ }*/
 
-    //Serial.println(id_tomada);
-  case 0:
-
-    Serial.println("Entrou na tomada1 sim");
-    if (comando != statusT1) {
-      if(comando){
-        digitalWrite(tomada1, HIGH);//Arduino porta digital D8=5V;
-        statusT1 = true;
-        //client.print("te1off");//Ethernet envia string para Android;
-      } 
-      else {
-        digitalWrite(tomada1, LOW);//Arduino porta digital D8=5V;
-        //client.print("te1off");//Ethernet envia string para Android;
-      }
-    }
-    break; 
-
-  case 1:
-    if (comando != statusT2) {
-      if(comando){
-        //digitalWrite(tomada2, HIGH);//Arduino porta digital D8=5V;
-        client.print("te2on");//Ethernet envia para Android;
-      } 
-      else {
-        digitalWrite(tomada2, LOW);//Arduino porta digital D8=5V;
-        //client.print("te2off");//Ethernet envia string para Android;
-      }
-    }
-    break; 
-
-  case 2:
-    if (comando != statusT3) {
-      if(comando){
-        digitalWrite(tomada3, HIGH);//Arduino porta digital D8=5V;
-        //client.print("te3on");//Ethernet envia para Android;
-      } 
-      else {
-        digitalWrite(tomada3, LOW);//Arduino porta digital D8=5V;
-        //client.print("te3off");//Ethernet envia string para Android;
-      }
-    }
-    break; 
-
-  case 3:
-    if (comando != statusT4) {
-      if(comando){
-        digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
-        //client.print("te4on");//Ethernet envia para Android;
-      } 
-      else {
-        digitalWrite(tomada4, LOW);//Arduino porta digital D8=5V;
-        //client.print("te4off");//Ethernet envia string para Android;
-      }
-    }
-    break; 
-
-  default:
-    Serial.print("disparaComandoTomada, opcao invalida ");
-    Serial.println(comando);
-    break;
-  }
-  //client.stop();
-}
-
-void lista_programacao(){
-  Serial.println("Listando programacao");
-  for(int i = 0; i < cont_array_programar; ++i){
-    Serial.println(""); 
-    Serial.println(array_programar[i].id_tomada);
-    Serial.println(array_programar[i].comando);
-    Serial.println(array_programar[i].hora);
-    Serial.println(array_programar[i].minutos);
-  }
-}
-
-boolean executa_programacao(){
-
-  boolean status;
-  int hora = hour();
-  int minutos = minute();
-  /*Serial.print("hora atual ");
-   Serial.print(hora);
-   Serial.print("hora funcao ");
-   Serial.println( hour());
-   Serial.print("minutos atual ");
-   Serial.print(minutos);
-   Serial.print(" funcao ");
-   Serial.println(minute());
-   
-   Serial.print("Tamanho do cont_array ");*/
-  //Serial.println(cont_array_programar);
-  for(int i = 0; i <= cont_array_programar; ++i){
-    if(array_programar[i].ja_executado == false)
-      if(array_programar[i].hora == hora){
-        //Serial.println("Entrou hora hora hora");
-        if(array_programar[i].minutos <= minutos){
-          //Serial.println("Entrou em minutos tambem");
-          disparaComandoTomada(array_programar[i].id_tomada, array_programar[i].comando);
-          //Serial.println("Disparando Comando");
-          //Serial.print("Entrou para id ");
-          //Serial.println(array_programar[i].id_tomada);
-
-          array_programar[i].ja_executado = true;
-          status = true;      
-        }
-      }
-    else{
-      status = false;
-      //Serial.println("Nenhum Agendamento para Disparar"); 
-    }
-  }
-  return status; 
-}
-
+/*boolean executa_programacao(){
+ 
+ boolean status;
+ int hora = hour();
+ int minutos = minute();
+ //Serial.println(cont_array_programar);
+ for(int i = 0; i <= cont_array_programar; ++i){
+ if(array_programar[i].ja_executado == false)
+ if(array_programar[i].hora == hora){
+ //Serial.println("Entrou hora hora hora");
+ if(array_programar[i].minutos <= minutos){
+ //Serial.println("Entrou em minutos tambem");
+ disparaComandoTomada(array_programar[i].id_tomada, array_programar[i].comando);
+ //Serial.println("Disparando Comando");
+ //Serial.print("Entrou para id ");
+ //Serial.println(array_programar[i].id_tomada);
+ 
+ array_programar[i].ja_executado = true;
+ status = true;      
+ }
+ }
+ else{
+ status = false;
+ //Serial.println("Nenhum Agendamento para Disparar"); 
+ }
+ }
+ return status; 
+ }
+ */
 //Programa para desligar, True ou false
-boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos, boolean ja_executado)
-{
+/*boolean programarTomada(int id_tomada, boolean comando, int hora, int minutos, boolean ja_executado)
+ {
+ 
+ struct programar p;
+ p.id_tomada = id_tomada;
+ p.comando = comando;
+ p.hora = hora;
+ p.minutos = minutos;
+ p.ja_executado = ja_executado;
+ //se ainda houver vaga
+ 
+ if((cont_array_programar < array_programar_size) && (verificaSeJaAgendado(p.id_tomada, p.comando)))
+ {
+ 
+ array_programar[cont_array_programar] = p;
+ ++cont_array_programar;
+ return true;   
+ }
+ return false;
+ }
+ */
+/*boolean define_programacao_diaria(){
+ 
+ 
+ boolean retorno_programar;
+ boolean estado;
+ 
+ retorno_programar = programarTomada(0, true, 0, 0, false); //Tomada 1, desligar, 2 horas e 20 minutos, se ja agendado(true, falses)
+ if(retorno_programar){
+ //Serial.println("Programacao efetuada com sucesso.");
+ estado = true;
+ }
+ else{
+ //Serial.println("Falha ao programar");
+ estado = false; 
+ }
+ 
+ retorno_programar = programarTomada(1, true, 2, 20, false); //Tomada 2, desligar, 2 horas e 20 minutos
+ if(retorno_programar){
+ //Serial.println("Programacao efetuada com sucesso.");
+ estado = true;
+ }
+ else{
+ //Serial.println("Falha ao programar");
+ estado = false;
+ }
+ 
+ retorno_programar = programarTomada(2, true, 5, 50, false); //Tomada 3, desligar, 6 horas e 0 minutos
+ if(retorno_programar){
+ //Serial.println("Programacao efetuada com sucesso.");
+ estado = true;
+ }
+ else{
+ //Serial.println("Falha ao programar");
+ estado = false;
+ }
+ 
+ retorno_programar = programarTomada(3, true, 10, 0, false); //Tomada 1, desligar, 0 horas 0 minutos
+ if(retorno_programar){
+ //Serial.println("Programacao efetuada com sucesso.");
+ estado = true;
+ }
+ else{
+ //Serial.println("Falha ao programar");
+ estado = false;
+ }
+ 
+ return estado;
+ }
+ */
+/*boolean verificaSeJaAgendado(int id_tomada, boolean comando){
+ 
+ for(int i = 0; i <= cont_array_programar; ++i){
+ if(array_programar[i].id_tomada == id_tomada)
+ if(array_programar[i].comando == comando)
+ return false;
+ }
+ return true; // Pode ja esta agendado, porem com outro comando
+ }*/
 
-  struct programar p;
-  p.id_tomada = id_tomada;
-  p.comando = comando;
-  p.hora = hora;
-  p.minutos = minutos;
-  p.ja_executado = ja_executado;
-  //se ainda houver vaga
-
-  if((cont_array_programar < array_programar_size) && (verificaSeJaAgendado(p.id_tomada, p.comando)))
-  {
-    /*Serial.println("Inserida Programacao");
-     Serial.print(p.id_tomada);
-     Serial.print(" ");
-     Serial.print(p.comando);
-     Serial.print(" ");
-     Serial.print(p.hora);
-     Serial.print(" ");
-     Serial.print(p.minutos);
-     Serial.println(" ");*/
-    array_programar[cont_array_programar] = p;
-    ++cont_array_programar;
-    return true;   
-  }
-  return false;
-}
-
-boolean define_programacao_diaria(){
-
-
-  boolean retorno_programar;
-  boolean estado;
-
-  retorno_programar = programarTomada(0, true, 0, 0, false); //Tomada 1, desligar, 2 horas e 20 minutos, se ja agendado(true, falses)
-  if(retorno_programar){
-    //Serial.println("Programacao efetuada com sucesso.");
-    estado = true;
-  }
-  else{
-    //Serial.println("Falha ao programar");
-    estado = false; 
-  }
-
-  retorno_programar = programarTomada(1, true, 2, 20, false); //Tomada 2, desligar, 2 horas e 20 minutos
-  if(retorno_programar){
-    //Serial.println("Programacao efetuada com sucesso.");
-    estado = true;
-  }
-  else{
-    //Serial.println("Falha ao programar");
-    estado = false;
-  }
-
-  retorno_programar = programarTomada(2, true, 5, 50, false); //Tomada 3, desligar, 6 horas e 0 minutos
-  if(retorno_programar){
-    //Serial.println("Programacao efetuada com sucesso.");
-    estado = true;
-  }
-  else{
-    //Serial.println("Falha ao programar");
-    estado = false;
-  }
-
-  retorno_programar = programarTomada(3, true, 10, 0, false); //Tomada 1, desligar, 0 horas 0 minutos
-  if(retorno_programar){
-    //Serial.println("Programacao efetuada com sucesso.");
-    estado = true;
-  }
-  else{
-    //Serial.println("Falha ao programar");
-    estado = false;
-  }
-
-  return estado;
-}
-
-boolean verificaSeJaAgendado(int id_tomada, boolean comando){
-
-  for(int i = 0; i <= cont_array_programar; ++i){
-    if(array_programar[i].id_tomada == id_tomada)
-      if(array_programar[i].comando == comando)
-        return false;
-  }
-  return true; // Pode ja esta agendado, porem com outro comando
-}
 
 
 
