@@ -30,10 +30,14 @@ IPAddress subnet(255, 255, 255, 0);
 #define PIN_SD_CARD 4
 File myFile;
 
-const int analogIn0 = A0;
-const int analogIn1 = A1;
-const int analogIn2 = A2;
-const int analogIn3 = A3;
+int tomada1 = 5;
+//tempo
+uint32_t lastTime=0;
+
+const int analogIn0 = A2;
+const int analogIn1 = A3;
+const int analogIn2 = A4;
+const int analogIn3 = A5;
 
 int mVperAmp = 66; 
 int RawValue0 = 0;
@@ -41,7 +45,7 @@ int RawValue1 = 0;
 int RawValue2 = 0;
 int RawValue3 = 0;
 
-int ACSoffset = 2500;
+int ACSoffset = 2488;
 
 double Voltage0 = 0;
 double Voltage1 = 0;
@@ -90,6 +94,8 @@ void setup(void)
   Serial.begin(9600);
   Serial.println("Sensor de Corrente ACS712"); Serial.println("");
   Serial.println("");
+  pinMode(tomada1, OUTPUT);
+  digitalWrite(tomada1, HIGH);
   
   Ethernet.begin(mac, ip);
   //Serial.print("IP Arduino ");
@@ -146,15 +152,19 @@ void loop(void)
 
 
 float calculaS0(){
+  //lastTime=millis();
   double energy;
   long milisec = millis(); // calculate time in milliseconds
   long time=milisec/1000; // convert milliseconds to seconds
 
-
-  RawValue0 = analogRead(analogIn0);
-  Voltage0 = (RawValue0 / 1024.0) * 5000; // Gets you mV
-  double amps = ((Voltage0 - ACSoffset) / mVperAmp);
+  RawValue1 = analogRead(analogIn0);
+  Voltage1 = (RawValue1 / 1024.0) * 5000; // Gets you mV
+  double amps = ((Voltage1 - ACSoffset) / mVperAmp);
   
+//  amps /= 10;
+  //tratar ruido
+  //if(amps < 0.350)
+    //amps = 0;
   //double amps = calcula_corrente0();
 //original
   /*totamps=totamps+amps; // calculate total amps
@@ -164,15 +174,22 @@ float calculaS0(){
   energy=(watt*time)/3600; //Watt-sec is again convert to Watt-Hr by dividing 1hr(3600sec)
   energy=(watt*time)/(1000*3600); //for reading in kWh
   */
-  totamps0 = totamps0 + amps; // calculate total amps
-  avgamps0 = totamps0 / time; // average amps
-  amphr0 = (avgamps0 * time)/3600; // amp-hour
+  //totamps0 = totamps0 + amps; // calculate total amps
+  //avgamps0 = totamps0 / time; // average amps
+  //amphr0 = (avgamps0 * time)/3600; // amp-hour
   watt0 = voltage_mcz * amps; // power=voltage*current
   //energy = (watt * time)/3600; //Watt-sec is again convert to Watt-Hr by dividing 1hr(3600sec)
-  energy = (watt0 * time)/(1000 * 3600); //kwh
+  //long time1 = (millis()-lastTime)/1000;
+  energy = (watt0 * time )/(1000 * 3600); //kwh
   
-  Serial.print("Consp KWH S0: ");
-  Serial.println(energy);
+  Serial.print("amps instantaneo: ");
+  Serial.println(amps);
+  Serial.print("watts instantaneo: ");
+  Serial.println(watt0);
+  //Serial.print("Consp KWH S0: ");
+  //Serial.println(energy);
+  
+  delay(1000);
 }
 
 
@@ -216,7 +233,7 @@ float calculaS2(){
   RawValue2 = analogRead(analogIn2);
   Voltage2 = (RawValue2 / 1024.0) * 5000; // Gets you mV
   double amps = ((Voltage2 - ACSoffset) / mVperAmp);
-  
+  Serial.println(amps);
   //double amps = calcula_corrente0();
 //original
   /*totamps=totamps+amps; // calculate total amps
@@ -233,9 +250,10 @@ float calculaS2(){
   //energy = (watt * time)/3600; //Watt-sec is again convert to Watt-Hr by dividing 1hr(3600sec)
   energy = (watt2 * time)/(1000 * 3600); //kwh
   
-  Serial.print("Consp KWH S2: ");
-  Serial.println(energy);
-  return energy;
+//  Serial.print("Consp KWH S2: ");
+ // Serial.println(energy);
+ // return energy;
+ delay(250);
 }
 
 float calculaS3(){

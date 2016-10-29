@@ -1,0 +1,24 @@
+ventilador:
+- Tomada 1
+	- consumo standby N/A
+	- Consumo velocidade 1 ~62W
+	- Consumo velocidade 2 ~72W
+	- Consumo velocidade 3 ~87W
+
+- Monitor TV Samsung SyncMaster T240M
+	- consumo standby  ~2W dentro da faixa de ruído do sensor mas apresentando em alguns momentos leituras próximas aos 22w
+	- consumo em uso
+		- modo de imagem Padrão
+			- luz de fundo 10 ~ 47W
+			- luz de fundo 5  ~ 42W	
+
+- Xbox one T1540
+	- consumo em standby 45W~58W verificar
+	- consumo na tela inicial instaladno jogo ~82W
+	- consumo na usando netflix ~89W
+	- consumo menu inicial jogo gears of war ultimate ~120W
+
+- Decodificar TV NET DCL106 A
+	- consumo standby ~30W
+	- consumo em uso ~30W
+
