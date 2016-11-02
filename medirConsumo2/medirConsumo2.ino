@@ -65,7 +65,7 @@ int calibraLeitura(int sensor){
   
   while(valorCorrente != 0){
   //Serial.print("Valor: ");
-  Serial.println(valCalibInterno);
+  //Serial.println(valCalibInterno);
   for(int i = 5000; i > 0; -i--){
     // le o sensor na pino analogico A0 e ajusta o valor lido ja que a saída do sensor é (1023)vcc/2 para corrente =0
     sensorValue_aux = (analogRead(sensor) - valCalibInterno); 
@@ -183,7 +183,7 @@ for(int i = 1000; i > 0; i--){
   // de valores alto acima de 0.25 Amperes até 30.
   // por isso é normal ocorrer ruidos de até 0.20A
   //por isso deve ser tratado
-  if(valorCorrente <= 0.250){
+  if(valorCorrente <= 0.130){
     valorCorrente = 0; 
   }
 
