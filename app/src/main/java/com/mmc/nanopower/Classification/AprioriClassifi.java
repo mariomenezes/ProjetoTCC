@@ -36,16 +36,17 @@ public class AprioriClassifi  extends AsyncTask<String, Void, Boolean> {
             //data = ConverterUtils.DataSource.read("res/dataBase.arff");
 
 
-            data = ConverterUtils.DataSource.read("/storage/emulated/0/database.arff");
+            //data = ConverterUtils.DataSource.read("/storage/emulated/0/database.arff");
+            data = ConverterUtils.DataSource.read("/storage/emulated/0/baseTesteConv.arff");
         } catch (Exception e) {
             e.printStackTrace();
         }
         //data.setClassIndex(data.numAttributes() - 1);
-        data.setClassIndex(data.numAttributes() - 1);
+        //data.setClassIndex(data.numAttributes() - 1);
 
         // build associator
         Apriori apriori = new Apriori();
-        apriori.setClassIndex(data.classIndex());
+        //apriori.setClassIndex(data.classIndex());
         try {
             apriori.buildAssociations(data);
         } catch (Exception e) {

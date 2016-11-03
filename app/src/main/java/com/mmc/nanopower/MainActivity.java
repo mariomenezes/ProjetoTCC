@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
+import com.mmc.nanopower.Fuzzy.DecisionAssist;
+import com.mmc.nanopower.communication.ArduinoSensorState;
 import com.mmc.nanopower.communication.SwitchStateListen1;
 import com.mmc.nanopower.Classification.AprioriClassifi;
 import com.mmc.nanopower.communication.ArduinoPostRequest;
@@ -39,6 +41,20 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO test apriori
         new AprioriClassifi().execute();
+
+        //Test Logica Fuzzy
+        new DecisionAssist().execute("TCC");
+
+        //Deixa consultando os valores dos sensores e salva na classe singleton SaveState
+        //new ArduinoPostRequest().execute("state");
+
+        new ArduinoSensorState().execute();
+
+        //Chama a classe que ira ler os dados de SaveState e executar os comandos
+
+        new ArduinoPostRequest().execute("fuzzy");
+
+
 
 
         tomada_switch1 = (Switch) findViewById(R.id.tomada_switch1);
