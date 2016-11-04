@@ -17,6 +17,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".communication.ExecutarTarefaProgramadaReceiver"
+            android:label="ExecutarTarefaProgramadaReceiver" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="BROADCAST_RECEIVER_XML" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -132,4 +132,8 @@ public class SaveState {
     public void setFuzzyActiveT3(boolean state){
         tomada3FuzzyActive = state;
     }
+
+    public void setLinha(){
+
+    }
 }

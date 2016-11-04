@@ -14,6 +14,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/*Exemplo de saída
+* </html>t1ft2ft3f#t32#l4#d5#h19#m5</html>
+* */
+
 /**
  * Created by mario on 03/11/16.
  */
@@ -65,9 +69,10 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
                 linha = sb.toString();
 
-                Log.d("TESTANDO", linha);
+                Log.d("CARALHO ", linha);
 
-                updateSensorStatus(linha);
+
+                //updateSensorStatus(linha);
 
 
                 Erro = false;
@@ -84,14 +89,32 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 Erro = true;
             }*/
 
-            return Erro;
 
+
+            try {
+                Thread.sleep(60000);
+                // Do some stuff
+                Log.d("SENSOR ", "DORMIU");
+            } catch (Exception e) {
+                e.getLocalizedMessage();
+            }
+            Log.d("TESTE", " ACORDOU");
+
+            //return Erro;
+            teste(linha);
+
+        }
+    }
+
+    private void teste(String read){
+        if(read.contains("#t")){
+            Log.d("TEMPOK", read);
         }
     }
 
     public void updateSensorStatus(String linha) {
 
-        Log.d("TESTE", " DOIDO");
+        Log.d("TESTE", " SENSOR");
         int aux = 0;
         String read = "";
         ArrayList<String> consulta = new ArrayList<>();
@@ -105,7 +128,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
         while (j < consulta.size()) {
             if (linha.contains(consulta.get(j))) {
                 for (int i = 0; i < linha.length(); ++i) {
-                    if (linha.charAt(i) == '#' && linha.charAt(i + 1) == 't') {
+                    if (linha.charAt(i) == '#') {
                         aux = i + 1;
                         while (linha.charAt(aux) != '#') {
                             read.concat(String.valueOf(linha.charAt(aux + 1)));
@@ -114,22 +137,24 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                         aux = 0;
                     }
                 }
+                Log.d("PASSANDO ",read);
                 switch (consulta.get(j)) {
                     case "#t":
-                        saveState.setTemperatura(Float.valueOf(read));
+                        Log.d("SELIGA ",read);
+                        //saveState.setTemperatura(Float.valueOf(read));
                         break;
                     case "#l":
-                        saveState.setLuz(Float.valueOf(read));
+                        //saveState.setLuz(Float.valueOf(read));
                         break;
                     case "#d":
-                        saveState.setDiaSemana(Integer.valueOf(read));
+                        //saveState.setDiaSemana(Integer.valueOf(read));
                         break;
                     case "#h":
-                        saveState.setHora(Float.valueOf(read));
+                        //saveState.setHora(Float.valueOf(read));
                         break;
                 }
 
-                Log.d("VALOR LIDO", read);
+                Log.d("VALOR ", read);
             }
             read = "";
             ++j;
@@ -141,29 +166,22 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
     @Override
     protected void onProgressUpdate(String... params) {
-        Log.d("DORMIU", " UPDATE");
+        //Log.d("DORMIU", " UPDATE");
 
         // Runs on UI thread after publishProgress(Progress...) is invoked
         // from doInBackground()
         //return true;
 
 
-        Log.d("ACORDOU", " UPDATE");
+      //  Log.d("ACORDOU", " UPDATE");
         //updateSensorStatus();
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-        Log.d("TESTE", " DORMIU");
+      //  Log.d("TESTE", " DORMIU");
         // Runs on the UI thread after doInBackground()
 
-        try {
-            Thread.sleep(3000);
-            // Do some stuff
-        } catch (Exception e) {
-            e.getLocalizedMessage();
-        }
-        Log.d("TESTE", " ACORDOU");
 
     }
 

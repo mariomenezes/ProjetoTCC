@@ -180,7 +180,9 @@ void controleTomadas(){
     {
       if (client.available())
       {
+        
         char c = client.read();
+        Serial.print(c);
         // ler caractere por caractere vindo do HTTP
         if (readString.length() < 30)
         {
@@ -206,6 +208,7 @@ void controleTomadas(){
             // O Led vai ser ligado
             digitalWrite(tomada1, HIGH);//Arduino porta digital D5=5V;
             statusT1 = true;
+            Serial.print("OK1");
             registraEventoArffSd();
           }
           // Se a string possui o texto L=Desligar
@@ -300,14 +303,35 @@ void controleTomadas(){
             //String apenas letras;
           }
           //------------------------------------------------------------------ 
-          if (statusT4) {
+          /*if (statusT4) {
             client.print("t4o");//Ethernet envia para Android;
             //String apenas letras;
           } 
           else {
             client.print("t4f");//Ethernet envia string para Android;
             //String apenas letras;
-          }
+          }*/
+          char buff0[20];
+          char buff1[20];
+          char buff2[20];
+          char buff3[20];
+          char buff4[20];
+          int t = lerTemperatura();
+          int l = lerQtdLuz();
+          String teste = "#t"; 
+          teste += dtostrf(t, 0, 0, buff0);
+          teste += "#l";
+          teste += dtostrf(l, 0, 0, buff1);
+          teste += "#d";
+          teste += dtostrf(weekday(), 0, 0, buff2);
+          teste += "#h";
+          teste += dtostrf(hour(), 0, 0, buff3);
+          teste += "#m";
+          teste += dtostrf(minute(), 0, 0, buff4);
+          client.print(teste);
+          //client.print( + '#' 
+            //                  +  +'#'+
+              //                + '#' + 
           //------------------------------------------------------------------ 
           //limpa string para a próxima leitura
           readString="";
@@ -460,12 +484,13 @@ void registraEventoArffSd()
   char buff6[20];
 
   //status das tomadas
-  String t1, t2, t3, t4;
+  //String t1, t2, t3, t4;
+  String t1, t2, t3;
   //int c1, c2, c3, c4;
   t1 = (statusT1)?"o":"f";
   t2 = (statusT2)?"o":"f";
   t3 = (statusT3)?"o":"f";
-  t4 = (statusT4)?"o":"f";
+  //t4 = (statusT4)?"o":"f";
 
   //status temperatura
   int t = lerTemperatura();
@@ -497,7 +522,11 @@ void registraEventoArffSd()
   // if the file opened okay, write to it:
   //if (myFile) {
   //    Serial.print("Writing to base.ARFF...");
-  Serial.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 0, buff0) 
+//  Serial.println(t1+","+t2+","+t3+","+t4+","+dtostrf(t, 0, 0, buff0) 
+//    +","+ dtostrf(l, 0, 0, buff1) +","+ dtostrf(weekday(), 0, 0, buff2) +","
+//    + dtostrf(month(), 0, 0, buff3) +","+ dtostrf(year(), 0, 0, buff4) +","
+//    + dtostrf(hour(), 0, 0, buff5) +","+ dtostrf(minute(), 0, 0, buff6));
+Serial.println(t1+","+t2+","+t3+","+dtostrf(t, 0, 0, buff0) 
     +","+ dtostrf(l, 0, 0, buff1) +","+ dtostrf(weekday(), 0, 0, buff2) +","
     + dtostrf(month(), 0, 0, buff3) +","+ dtostrf(year(), 0, 0, buff4) +","
     + dtostrf(hour(), 0, 0, buff5) +","+ dtostrf(minute(), 0, 0, buff6));

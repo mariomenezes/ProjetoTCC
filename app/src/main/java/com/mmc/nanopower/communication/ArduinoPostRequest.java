@@ -61,6 +61,7 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
                 // faço qualquer coisa com os parâmetros
 
                 try {
+                    Log.d("Executou", " entrou try");
                     for(int i = 0; i < arrayLiga.size(); ++i){
 
                         Log.d("Executando", "ARDUINO TESTE");
@@ -114,6 +115,30 @@ public class ArduinoPostRequest extends AsyncTask<String, Void, Boolean> {
 
                         Erro = false;
                     }
+
+                    Log.d("Executando", "ARDUINO TESTE");
+
+                    HttpClient client = new DefaultHttpClient();
+                    HttpGet requisicao = new HttpGet();
+                    requisicao.setHeader("Content-Type",
+                            "text/plain; charset=utf-8");
+                    requisicao.setURI(new URI(URL + params[0]));
+                    HttpResponse resposta = client.execute(requisicao);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(
+                            resposta.getEntity().getContent()));
+                    StringBuffer sb = new StringBuffer("");
+
+                    while ((linha = br.readLine()) != null) {
+                        sb.append(linha);
+                    }
+
+                    br.close();
+
+                    linha = sb.toString();
+
+                    Log.d("RESPOSTA ", linha);
+
+                    Erro = false;
 
                 } catch (Exception e) {
                     Erro = true;

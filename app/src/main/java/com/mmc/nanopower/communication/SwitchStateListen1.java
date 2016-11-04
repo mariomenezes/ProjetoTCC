@@ -83,23 +83,8 @@ public class SwitchStateListen1 extends AsyncTask<String, String, Boolean> {
 
     public void setEstadoTomada(String id_tomada, String linha) {
 
-        Log.d("TESTE", " DOIDO");
-        switch(id_tomada) {
-
-            case "tomada1":
-                tomada.setChecked(linha.contains("te1on"));
-                break;
-            case "tomada2":
-                tomada.setChecked(linha.contains("te2on"));
-                break;
-            case "tomada3":
-                tomada.setChecked(linha.contains("te3on"));
-                break;
-            case "tomada4":
-                tomada.setChecked(linha.contains("te4on"));
-                break;
-        }
-        Log.d("CHEGOU", "FINAL");
+        Log.d("TOMADA1 ", "alterou");
+        tomada.setChecked(linha.contains("t1o"));
     }
     @Override
     protected void onProgressUpdate(String... params) {
