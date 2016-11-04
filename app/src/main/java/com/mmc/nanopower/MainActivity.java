@@ -54,17 +54,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
 
-        gerarNotificacao();
+        //gerarNotificacao();
 
         //TODO test apriori
         new AprioriClassifi().execute();
 
-        boolean alarmeAtivo = (PendingIntent.getBroadcast(this, 0, new Intent("Alarme disparado"), PendingIntent.FLAG_NO_CREATE) == null);
+     //   boolean alarmeAtivo = (PendingIntent.getBroadcast(this, 0, new Intent("ExecutarTarefaProgramadaReceiver"), PendingIntent.FLAG_NO_CREATE) == null);
 
-        if(alarmeAtivo) {
-
+       // if(alarmeAtivo) {
+/*
             Log.i("NOVO ALARME ", "ATIVO");
-            Intent intent = new Intent("Alarme disparado");
+            Intent intent = new Intent("ExecutarTarefaProgramadaReceiver");
             PendingIntent p = PendingIntent.getBroadcast(this, 0, intent, 0);
 
             Calendar c = Calendar.getInstance();
@@ -74,9 +74,11 @@ public class MainActivity extends AppCompatActivity {
             AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
             //alarme.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), p);
             alarme.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), 60000, p);
-        }
-        else
-            Log.i("ALARME ", "JA ATIVO");
+
+            */
+//        }
+  //      else
+    //        Log.i("ALARME ", "JA ATIVO");
         //Test Logica Fuzzy
         //new DecisionAssist().execute("TCC");
 
@@ -95,24 +97,24 @@ public class MainActivity extends AppCompatActivity {
 //        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,  SystemClock.elapsedRealtime() + 60 * 1000, alarmIntent);
 //
 //        //Definir início para as 10 horas
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(Calendar.HOUR_OF_DAY, 19);
-//        calendar.set(Calendar.MINUTE, 33);
-//        calendar.set(Calendar.SECOND, 0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
+        calendar.set(Calendar.MINUTE, 33);
+        calendar.set(Calendar.SECOND, 0);
 
 //Definir intervalo de 6 horas
-        //long intervalo = 6*60*60*1000; //6 horas em milissegundos
-//        long intervalo = 60*1000; //1 minuto em milissegundos
-//
-//        Intent tarefaIntent = new Intent(this, ExecutarTarefaProgramadaReceiver.class);
-//        PendingIntent tarefaPendingIntent = PendingIntent.getBroadcast(this, 0, tarefaIntent,0);
-//
-//        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-//
-////Definir o alarme para acontecer de 6 em 6 horas a partir das 10 horas
-//        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                intervalo, tarefaPendingIntent);
-        //PROGRAMAR LEITURA
+  //      long intervalo = 6*60*60*1000; //6 horas em milissegundos
+        long intervalo = 60*1000; //1 minuto em milissegundos
+
+        Intent tarefaIntent = new Intent(this, ExecutarTarefaProgramadaReceiver.class);
+        PendingIntent tarefaPendingIntent = PendingIntent.getBroadcast(this, 0, tarefaIntent,0);
+
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+
+//Definir o alarme para acontecer de 6 em 6 horas a partir das 10 horas
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                intervalo, tarefaPendingIntent);
+//        PROGRAMAR LEITURA
 
 
 
@@ -268,6 +270,12 @@ public class MainActivity extends AppCompatActivity {
         }
         catch(Exception e){}
     }
+
+//    @Override
+//    public void onDestroy(){
+//        super.onDestroy();
+//    }
+
 
 
 }

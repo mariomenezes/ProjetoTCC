@@ -20,10 +20,11 @@
         <receiver
             android:name=".communication.ExecutarTarefaProgramadaReceiver"
             android:label="ExecutarTarefaProgramadaReceiver" >
+            android:process=":remote"
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <action android:name="BROADCAST_RECEIVER_XML" />
+
             </intent-filter>
         </receiver>
     </application>
