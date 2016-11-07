@@ -4,21 +4,10 @@
 
 int pinoSensor1 = A2; // Tomada 1
 int pinoSensor2 = A3; // pIn de calibracao  
-//int pinoSensor3 =A4; // tomada x
-//int pinoSensor4 =A5; // tomada y
-
-//Pinos digitais das tomadas
-int tomada1 = 5;
-int tomada2 = 6;
-int tomada3 = 7;
-int tomada4 = 8;
 
 int valorCalibracao;
 int ValorSensorCali = 0;
-//int valorCalibracao1 = 0;
-//int valorCalibracao2 = 0;
-//int valorCalibracao3 = 0;
-//int valorCalibracao4 = 0;
+
 
 int sensorValue_aux = 0;
 float valorSensor = 0;
@@ -42,16 +31,7 @@ void setup() {
   pinMode(pinoSensor2, INPUT);//usado apenas para calibracao
   //pinMode(pinoSensor3, INPUT);
   //pinMode(pinoSensor4, INPUT);
-    
-  pinMode(tomada1, OUTPUT);
-  pinMode(tomada2, OUTPUT);
-  pinMode(tomada3, OUTPUT);
-  pinMode(tomada4, OUTPUT);
-  
-  digitalWrite(tomada1, HIGH);
-  digitalWrite(tomada2, HIGH);  
-  digitalWrite(tomada3, HIGH);  
-  digitalWrite(tomada4, HIGH);
+ 
   
   delay(1000);
 
@@ -59,9 +39,9 @@ void setup() {
 
 int calibraLeitura(int sensor){
   
-  //Serial.println("Iniciando Calibracao ACS712");
+ // Serial.println("Iniciando Calibracao ACS712");
   
-  int valCalibInterno = 470;
+  int valCalibInterno = 490;
   
   while(valorCorrente != 0){
   //Serial.print("Valor: ");
@@ -139,10 +119,13 @@ int cont_calibra = 0;
 boolean calibrado = false;
 
 void loop() {
+  
   ++cont_calibra;
   
-  if(cont_calibra == 50)
+  if(cont_calibra == 100){
+    cont_calibra = 0;
     calibraLeitura(A3);
+  }
   //delay(1000);
   //while(cont_calibracao < 3){
    // calibraLeitura(A2);
@@ -183,22 +166,24 @@ for(int i = 1000; i > 0; i--){
   // de valores alto acima de 0.25 Amperes até 30.
   // por isso é normal ocorrer ruidos de até 0.20A
   //por isso deve ser tratado
-  if(valorCorrente <= 0.130){
+  if(valorCorrente <= 0.250){
     valorCorrente = 0; 
   }
 
   valorSensor = 0;
   //Serial.print("P");
-  
+  //Serial.print(pinoSensor);
   if(pinoSensor == 17 && (valorCorrente * tensao) != 0)
     calibraLeitura(A3);
  
    if(pinoSensor == 16){   
     //Serial.print(pinoSensor);
-    //Serial.print(" ");
+    
     Serial.println(valorCorrente * tensao);
     //Serial.println(" Watts");
   }
+  //Serial.print(" ");
+  
   
   
 

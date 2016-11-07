@@ -59,8 +59,10 @@ public class ExecutarTarefaProgramadaReceiver extends BroadcastReceiver {
         Erro = false;
 
     } catch (Exception e) {
+            Log.d("PROBLEMA ", "exception");
         Erro = true;
     }
     }
+
 
 }

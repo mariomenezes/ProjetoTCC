@@ -24,17 +24,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.mmc.nanopower.Fuzzy.DecisionAssist;
 import com.mmc.nanopower.communication.ArduinoSensorState;
-import com.mmc.nanopower.communication.ExecutarTarefaProgramadaReceiver;
-import com.mmc.nanopower.communication.SwitchStateListen1;
+//import com.mmc.nanopower.communication.ExecutarTarefaProgramadaReceiver;
+//import com.mmc.nanopower.communication.SwitchStateListen1;
 import com.mmc.nanopower.Classification.AprioriClassifi;
 import com.mmc.nanopower.communication.ArduinoPostRequest;
-import com.mmc.nanopower.communication.SwitchStateListen2;
-import com.mmc.nanopower.communication.SwitchStateListen3;
+import com.mmc.nanopower.communication.BackgroundTest;
+//import com.mmc.nanopower.communication.SwitchStateListen2;
+//import com.mmc.nanopower.communication.SwitchStateListen3;
 
-import java.util.Calendar;
 
 
 //TODO provavelmente criar outra thread para verificar o estado dos botoes(dentro do onlistener nao funciona)
@@ -44,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private Switch tomada_switch1;
     private Switch tomada_switch2;
     private Switch tomada_switch3;
-    private Switch tomada_switch4;
-    private Switch switch_teste;
     private Button connect_button;
 
     @Override
@@ -58,70 +58,30 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO test apriori
         new AprioriClassifi().execute();
-
-     //   boolean alarmeAtivo = (PendingIntent.getBroadcast(this, 0, new Intent("ExecutarTarefaProgramadaReceiver"), PendingIntent.FLAG_NO_CREATE) == null);
-
-       // if(alarmeAtivo) {
-/*
-            Log.i("NOVO ALARME ", "ATIVO");
-            Intent intent = new Intent("ExecutarTarefaProgramadaReceiver");
-            PendingIntent p = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(System.currentTimeMillis());
-            c.add(Calendar.SECOND, 40);
-
-            AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
-            //alarme.set(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), p);
-            alarme.setRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), 60000, p);
-
-            */
-//        }
-  //      else
-    //        Log.i("ALARME ", "JA ATIVO");
-        //Test Logica Fuzzy
-        //new DecisionAssist().execute("TCC");
-
-        //Deixa consultando os valores dos sensores e salva na classe singleton SaveState
-//        new ArduinoSensorState().execute();
-
-        //Chama a classe que ira ler os dados de SaveState e executar os comandos
-        //new ArduinoPostRequest().execute("fuzzy");
-
-        //PROGRAMAR LEITURA
-//        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        //new BackgroundTest().execute();
+        new ArduinoSensorState().execute();
+        new DecisionAssist().execute();
+////////////////////////////////////////////////////////////
+//        int delay = 5000;   // delay de 5 seg.
+//        int interval = 60000;  // intervalo de 1 seg.
+//        Timer timer = new Timer();
 //
-//        Intent intent = new Intent(this, ExecutarTarefaProgramadaReceiver.class);
-//        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 //
-//        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,  SystemClock.elapsedRealtime() + 60 * 1000, alarmIntent);
 //
-//        //Definir início para as 10 horas
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 33);
-        calendar.set(Calendar.SECOND, 0);
-
-//Definir intervalo de 6 horas
-  //      long intervalo = 6*60*60*1000; //6 horas em milissegundos
-        long intervalo = 60*1000; //1 minuto em milissegundos
-
-        Intent tarefaIntent = new Intent(this, ExecutarTarefaProgramadaReceiver.class);
-        PendingIntent tarefaPendingIntent = PendingIntent.getBroadcast(this, 0, tarefaIntent,0);
-
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-
-//Definir o alarme para acontecer de 6 em 6 horas a partir das 10 horas
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                intervalo, tarefaPendingIntent);
-//        PROGRAMAR LEITURA
-
-
+//        timer.scheduleAtFixedRate(new TimerTask() {
+//            public void run() {
+//                // colocar tarefas aqui ...
+//                Log.d("FUNFOU"," amemmmmm");
+//                //TODO precisa ser testado
+//                new ArduinoSensorState().execute();
+//                new DecisionAssist().execute();
+//            }
+//        }, delay, interval);
+/////////////////////////////////////////////////////////////
 
         tomada_switch1 = (Switch) findViewById(R.id.tomada_switch1);
         tomada_switch2 = (Switch) findViewById(R.id.tomada_switch2);
         tomada_switch3 = (Switch) findViewById(R.id.tomada_switch3);
-       // tomada_switch4 = (Switch) findViewById(R.id.tomada_switch4);
 
         //TODO alterar sozinho o estado das tomdadas, parou de funcionar
         //new SwitchStateListen1(tomada_switch1).execute("tomada1");
@@ -188,27 +148,11 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View arg0) {
                 Log.d("CLICOU", " teste");
 
-
+                new ArduinoSensorState().execute();
 
             }
 
         });
-
-
-        //ArduinoPostRequest a = new ArduinoPostRequest();
-       // boolean b[] = a.getEstadoTomadas();
-        //tomada_switch1.setChecked(true);
-        //tomada_switch2.setChecked(true);
-        //tomada_switch3.setChecked(true);
-        //tomada_switch4.setChecked(true);
-
-        //TSP_GA genetico = new TSP_GA(50, 100);
-//        SwitchStateListen1 s = new SwitchStateListen1(tomada_switch1, tomada_switch2,tomada_switch3,tomada_switch4);
-        //s.execute("teste");
-        //String stemp = s.getLinha();
-        //s.setEstadoTomada(stemp);
-
-
     }
 
 
@@ -276,6 +220,53 @@ public class MainActivity extends AppCompatActivity {
 //        super.onDestroy();
 //    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("FUNFOU", "On Start .....");
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("FUNFOU", "On Destroy .....");
+    }
+    /* (non-Javadoc)
+    * @see android.app.Activity#onPause()
+    */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("FUNFOU", "On Pause .....");
+    }
 
+    /* (non-Javadoc)
+    * @see android.app.Activity#onRestart()
+    */
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.i("FUNFOU", "On Restart .....");
+    }
 
+    /* (non-Javadoc)
+    * @see android.app.Activity#onResume()
+    */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("FUNFOU", "On Resume .....");
+    }
+
+    /* (non-Javadoc)
+    * @see android.app.Activity#onStart()
+    */
+
+    /* (non-Javadoc)
+    * @see android.app.Activity#onStop()
+    */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("FUNFOU", "On Stop .....");
+    }
 }

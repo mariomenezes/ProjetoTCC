@@ -47,15 +47,15 @@ EthernetServer server(80);
 
 int tomada1 = 5;//Arduino digital D5;
 int tomada2 = 6;//Arduino digital D6;
-int tomada3 = 7;//Arduino digital D7;
-int tomada4 = 8;//Arduino digital D8;
+int tomada3 = 8;//Arduino digital D7;
+//int tomada4 = 8;//Arduino digital D8;
 //-------------------------------------------------------------------
 String readString = String(30); // string para buscar dados de endereço
 
 boolean statusT1 = false; // Variável para o status do led 
 boolean statusT2 = false; // Variável para o status do led 
 boolean statusT3 = false; // Variável para o status do led 
-boolean statusT4 = false; // Variável para o status do led 
+//boolean statusT4 = false; // Variável para o status do led 
 
 
 
@@ -89,7 +89,7 @@ void setup()
   pinMode(tomada1, OUTPUT);
   pinMode(tomada2, OUTPUT);
   pinMode(tomada3, OUTPUT);
-  pinMode(tomada4, OUTPUT);
+  //pinMode(tomada4, OUTPUT);
 
   // Seta porta SdCard
   //pinMode(PIN_SD_CARD, OUTPUT);
@@ -197,8 +197,8 @@ void controleTomadas(){
           client.println("HTTP/1.1 200 OK");
           client.println("Content-Type: text/html");
           client.println();      
-          client.print("<font size='20'>");
-          client.println("</html>");
+          //client.print("<font size='20'>");
+          //client.println("</html>");
           
           //Serial.println("Entrou");
           //------------------------------------------------------------------        
@@ -253,21 +253,21 @@ void controleTomadas(){
             registraEventoArffSd();
           }
           //------------------------------------------------------------------        
-          else if(readString.indexOf("t4h")>=0)//Recebido do Android;
-          {
-            // O Led vai ser ligado
-            digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
-            statusT4 = true;
-            registraEventoArffSd();
-          }
-          // Se a string possui o texto L=Desligar
-          else if(readString.indexOf("t4l")>=0)//Recebido do Android;
-          {
-            // O Led vai ser desligado
-            digitalWrite(tomada4, LOW);//Arduino porta digital D8=0V;
-            statusT4 = false;
-            registraEventoArffSd();
-          } 
+//          else if(readString.indexOf("t4h")>=0)//Recebido do Android;
+//          {
+//            // O Led vai ser ligado
+//            digitalWrite(tomada4, HIGH);//Arduino porta digital D8=5V;
+//            statusT4 = true;
+//            registraEventoArffSd();
+//          }
+//          // Se a string possui o texto L=Desligar
+//          else if(readString.indexOf("t4l")>=0)//Recebido do Android;
+//          {
+//            // O Led vai ser desligado
+//            digitalWrite(tomada4, LOW);//Arduino porta digital D8=0V;
+//            statusT4 = false;
+//            registraEventoArffSd();
+//          } 
           //------------------------------------------------------------------         
           // dados HTML de saída começando com cabeçalho padrão
 //          client.println("HTTP/1.1 200 OK");
@@ -318,16 +318,17 @@ void controleTomadas(){
           char buff4[20];
           int t = lerTemperatura();
           int l = lerQtdLuz();
-          String teste = "#t"; 
+          String teste = "!"; 
           teste += dtostrf(t, 0, 0, buff0);
-          teste += "#l";
+          teste += "@";
           teste += dtostrf(l, 0, 0, buff1);
-          teste += "#d";
+          teste += "#";
           teste += dtostrf(weekday(), 0, 0, buff2);
-          teste += "#h";
+          teste += "$";
           teste += dtostrf(hour(), 0, 0, buff3);
-          teste += "#m";
+          teste += "%";
           teste += dtostrf(minute(), 0, 0, buff4);
+          teste += "&";
           client.print(teste);
           //client.print( + '#' 
             //                  +  +'#'+
@@ -335,7 +336,7 @@ void controleTomadas(){
           //------------------------------------------------------------------ 
           //limpa string para a próxima leitura
           readString="";
-          client.println("</html>");
+          //client.println("</html>");
           // parar cliente
           client.stop();
         }

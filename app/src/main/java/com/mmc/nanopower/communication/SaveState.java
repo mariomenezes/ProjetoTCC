@@ -1,5 +1,7 @@
 package com.mmc.nanopower.communication;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 /**
@@ -7,10 +9,11 @@ import java.util.ArrayList;
  */
 public class SaveState {
 
-    private float temperatura;
-    private float luz;
-    private int diaSemana;
-    private float hora;
+    private double temperatura;
+    private double luz;
+    private double diaSemana;
+    private double hora;
+    private double minuto;
 
     //True liga, False desliga tomada
     private boolean tomada1;
@@ -77,37 +80,46 @@ public class SaveState {
     }
 
 
-    public void setTemperatura(float t){
+    public void setTemperatura(double t){
+        Log.d("TEMPRATURA", String.valueOf(t));
         temperatura = t;
     }
 
-    public void setLuz(float l){
+    public void setLuz(double l){
+        Log.d("LUZ", String.valueOf(l));
         luz = l;
     }
 
-    public void setDiaSemana(int d){
+    public void setDiaSemana(double d){
+        Log.d("DIA", String.valueOf(d));
         diaSemana = d;
     }
 
-    public void setHora(float h){
+    public void setHora(double h){
+        Log.d("HORA", String.valueOf(h));
         hora = h;
     }
 
-    public float getTemperatura(){
+    public void setMinuto(double h){
+        Log.d("MINUTO", String.valueOf(h));
+        hora = h;
+    }
+
+    public double getTemperatura(){
         return temperatura;
     }
 
-    public float getLuz(){
-        return luz;
-    }
+    public double getLuz(){ return luz;}
 
-    public int getDiaSemana(){
+    public double getDiaSemana(){
         return diaSemana;
     }
 
-    public float getHora(){
+    public double getHora(){
         return hora;
     }
+
+    public double getMinuto() {return minuto; }
 
     public boolean getFuzzyActiveT1(){
         return tomada1FuzzyActive;
