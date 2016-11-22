@@ -57,19 +57,29 @@ public class SaveState {
     public void setTomada(String name, boolean state, double res){
         switch (name){
             case "tomada1":
-                tomada1 = state;
-                resTomada1 = res;
-                setFuzzyActiveT1(true);
+                //Caso tomada ja estiver ligada e o comando for para ligar, entao sera ignorado
+                if(getTomada1() != state) {
+                    Log.d("SET TOMADA 1", " estado diferente, agendamento inserido");
+                    tomada1 = state;
+                    resTomada1 = res;
+                    setFuzzyActiveT1(true);
+                }
                 break;
             case "tomada2":
-                tomada2 = state;
-                resTomada2 = res;
-                setFuzzyActiveT2(true);
+                if(getTomada2() != state) {
+                    Log.d("SET TOMADA 2", " estado diferente, agendamento inserido");
+                    tomada2 = state;
+                    resTomada2 = res;
+                    setFuzzyActiveT2(true);
+                }
                 break;
             case "tomada3":
-                tomada3 = state;
-                resTomada3 = res;
-                setFuzzyActiveT3(true);
+                if(getTomada3() != state) {
+                    Log.d("SET TOMADA 3", " estado diferente, agendamento inserido");
+                    tomada3 = state;
+                    resTomada3 = res;
+                    setFuzzyActiveT3(true);
+                }
                 break;
         }
 

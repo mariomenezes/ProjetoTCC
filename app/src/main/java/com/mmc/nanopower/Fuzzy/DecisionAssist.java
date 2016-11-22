@@ -123,13 +123,27 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
         double res = fis.getVariable(tomada.toUpperCase()).getLatestDefuzzifiedValue();
         Log.d("FUZZY ",tomada + String.valueOf(res));
 
+        //Intervalo entre nenhuma possibilidade, 0 e total possibilidade 1.0
+        //Serao considerados resultados com pelo menos 0.7 de possibilidade
         if(res >= 0.0 && res <= 1.0){
             Log.d(tomada, " Possibilidade de ligar" + res);
+            if(res >= 0.7){
+                saveState.setTomada(tomada, true, res);
+                Log.d("TOMADAS", " ligacao pendente");
+            }
         }
+        //Intervalo entre nenhuma possibilidade, 2.0 e total possibilidade 3.0
+        //Serao considerados resultados com pelo menos 2.7 de possibilidade
         else if(res >= 2.0 && res <= 3.0){
             Log.d(tomada, " Possibilidade de desligar" + res);
+            if(res >= 2.7){
+                Log.d("TOMADAS", " desligamento pendente");
+                saveState.setTomada(tomada, false, res);
+            }
+
         }
     }
+
 
     public double converteMinutosFracao(double minutos){
 

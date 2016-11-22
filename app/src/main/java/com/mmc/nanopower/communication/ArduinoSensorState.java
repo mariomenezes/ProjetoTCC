@@ -35,6 +35,8 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
 
+        //TODO verificar se mesmo enviando comando para tomada, o arduino continua respondendo
+        //corretamente o estado dos sensores
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
 
@@ -43,6 +45,64 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 String URL = "http://10.10.0.50/";
                 String linha = "";
                 boolean Erro = true;
+                /////alteracao teste aqui
+
+                //Sera executada uma tomada por vez pois, o Arduino esta programado para atender
+                //Apenas um comando por vez e retorna o resultado, visando melhorar o tempo de
+                //respposta e resolver os travamentos que ocorriam com a etrategia de procurar
+                //varios comandos na mesma requisicao
+
+                /*TODO, checar a necessidade de verificar o estado atual da tomada antes de mandar
+                o comando, ou deixar o arduino cuidar disso. Talvez o Arduino fique sobrecarregado
+                */
+
+                //informa apenas se existe um acao de ligar ou desligar pendente
+                if(saveState.getFuzzyActiveT1()){
+                    //Caso seja de ligar, será enviado comando de lgiar
+                    if(saveState.getTomada1()) {
+                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 1");
+                        URL.concat("t1h");
+                    }
+                    //caso contrario desliga
+                    else {
+                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 1");
+                        URL.concat("t1l");
+                    }
+                    //Envio sera executado, nao estara mais pendente
+                    saveState.setFuzzyActiveT1(false);
+                }
+                //TOMADA 2
+                else if(saveState.getFuzzyActiveT2()){
+                    //Caso seja de ligar, será enviado comando de lgiar
+                    if(saveState.getTomada2()) {
+                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 2");
+                        URL.concat("t2h");
+                    }
+                    //caso contrario desliga
+                    else {
+                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 2");
+                        URL.concat("t2l");
+                    }
+                    //Envio sera executado, nao estara mais pendente
+                    saveState.setFuzzyActiveT2(false);
+                }
+                //Para tomada 3
+                else if(saveState.getFuzzyActiveT3()){
+                    //Caso seja de ligar, será enviado comando de lgiar
+                    if(saveState.getTomada3()) {
+                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 3");
+                        URL.concat("t3h");
+                    }
+                    //caso contrario desliga
+                    else {
+                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 3");
+                        URL.concat("t3l");
+                    }
+                    //Envio sera executado, nao estara mais pendente
+                    saveState.setFuzzyActiveT3(false);
+                }
+
+                //////////////////////////
 
                 try {
 
