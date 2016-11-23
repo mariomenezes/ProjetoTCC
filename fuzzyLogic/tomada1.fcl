@@ -1,0 +1,63 @@
+FUNCTION_BLOCK simulador    // Início do bloco de definições
+
+	VAR_INPUT    // Define variáveis de entrada
+		temperatura: REAL;
+		luz: REAL;
+		hora: REAL;
+		dia: REAL;
+	END_VAR
+	   
+
+	VAR_OUTPUT   // Define variáveis de saída
+		tomada1 : REAL;
+	END_VAR
+
+	FUZZIFY temperatura
+		TERM frio        := (0.0, 0) (0.0, 1) (15.0, 1) (24.0, 0);
+		TERM agradavel   := (16.0, 0) (23.0, 1) (28.0, 0);
+		TERM esquentando := (24.0, 0) (30.0, 1) (36.0, 0);
+		TERM quente      := (28.0, 0) (39.0, 1) (50.0, 0);
+
+	END_FUZZIFY
+
+	FUZZIFY luz
+		TERM escuro     := (0.0, 0) (7, 1) (14.5, 0);
+		TERM meia_luz   := (6.0, 0) (13.0, 1) (20.5, 0);
+		TERM claro 		:= (14.5, 0) (22.25, 1) (29.0, 0);
+	END_FUZZIFY
+
+	FUZZIFY hora
+		TERM madrugada := (0.0, 0) (4.0, 1) (9.5, 0); 
+		TERM manha :=  (4.0, 0) (9.5, 1) (15.0, 0);
+		TERM tarde := (10.5, 0) (14.5, 1) (19.5, 0);
+		TERM noite := (15.5, 0) (20.0, 1) (24.00, 0);
+	END_FUZZIFY
+	
+	FUZZIFY dia
+		TERM dia_util := (1.0, 0) (3.0, 1) (5.0, 0); 
+		TERM final_de_semana :=  (6.0, 0) (6.0, 1) (7.0, 0);
+	END_FUZZIFY
+
+	DEFUZZIFY tomada1
+	
+		TERM LIGA := 1;
+		TERM DESLIGA := 0;
+	   	METHOD : COGS; // Método de defuzzificação. Utilizando Center of Gravity
+	   	DEFAULT := -1; // Valor a ser utilizado caso nenhuma regra seja ativada
+	END_DEFUZZIFY
+
+	RULEBLOCK No1
+	   AND : MIN;  // Método MIN utilizado no processamento do operador lógico AND
+	   ACT : MIN;  // Método de ativação
+	   ACCU : MAX; // método de acumulação
+
+
+		RULE 1 : IF dia IS dia_util AND temperatura IS quente AND hora IS noite THEN tomada1 IS LIGA;
+		RULE 2 : IF dia IS dia_util AND temperatura IS quente AND hora IS madrugada THEN tomada1 IS LIGA;
+		RULE 3 : IF dia IS final_de_semana AND temperatura IS quente AND hora IS noite THEN tomada1 IS LIGA;
+		RULE 4 : IF dia IS final_de_semana AND temperatura IS quente AND hora IS madrugada THEN tomada1 IS LIGA;
+		RULE 5 : IF luz IS escuro AND hora IS tarde THEN tomada1 IS DESLIGA;
+
+	END_RULEBLOCK
+
+END_FUNCTION_BLOCK
