@@ -114,40 +114,60 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
     private void fuzzyTomadas(String tomada){
 
+        double h = saveState.getHora();
+        double m = converteMinutosFracao(saveState.getMinuto());
+        double r = h + m;
+
+        Log.d("TOMADAS", "Fuzzy " + tomada + "valores:");
+        Log.d("TOMADAS",String.valueOf(saveState.getTemperatura()));
+        Log.d("TOMADAS",String.valueOf(saveState.getLuz()));
+        Log.d("TOMADAS",String.valueOf(saveState.getDiaSemana()));
+        Log.d("TOMADAS",String.valueOf(r));
         FIS fis = openFile(tomada);
-        fis.setVariable("TEMPERATURA",saveState.getTemperatura());
-        fis.setVariable("LUZ",saveState.getLuz());
-        fis.setVariable("DIA_SEMANA",saveState.getDiaSemana());
-        fis.setVariable("HORA",saveState.getHora() + converteMinutosFracao(saveState.getMinuto()));
+        fis.setVariable("temperatura",saveState.getTemperatura());
+        fis.setVariable("luz",saveState.getLuz());
+        fis.setVariable("dia",saveState.getDiaSemana());
+        fis.setVariable("hora", r);
+
         //variavel TOMADA1,TOMADA2,TOMADA3
-        double res = fis.getVariable(tomada.toUpperCase()).getLatestDefuzzifiedValue();
-        Log.d("FUZZY ",tomada + String.valueOf(res));
+        fis.evaluate();
+        double res = fis.getVariable(tomada.toLowerCase()).getLatestDefuzzifiedValue();
+        Log.d("FUZZY ",tomada +" " + String.valueOf(res));
 
         //Intervalo entre nenhuma possibilidade, 0 e total possibilidade 1.0
         //Serao considerados resultados com pelo menos 0.7 de possibilidade
-        if(res >= 0.0 && res <= 1.0){
-            Log.d(tomada, " Possibilidade de ligar" + res);
-            if(res >= 0.7){
+        if(res == 1.0){
+                Log.d(tomada, " Possibilidade de ligar");
+            //if(res >= 0.7){
                 saveState.setTomada(tomada, true, res);
                 Log.d("TOMADAS", " ligacao pendente");
-            }
+            //}
         }
         //Intervalo entre nenhuma possibilidade, 2.0 e total possibilidade 3.0
         //Serao considerados resultados com pelo menos 2.7 de possibilidade
-        else if(res >= 2.0 && res <= 3.0){
+        else if(res == 0){
             Log.d(tomada, " Possibilidade de desligar" + res);
-            if(res >= 2.7){
+           // if(res >= 2.7){
                 Log.d("TOMADAS", " desligamento pendente");
                 saveState.setTomada(tomada, false, res);
-            }
+            //}
 
+        }
+        else if(res == -1){
+            Log.d("TOMADAS", " nao encontrou nenhuma regra "+ tomada);
+        }
+
+        else{
+            Log.d("TOMADAS", "valor desconhecido" + String.valueOf(res));
         }
     }
 
 
     public double converteMinutosFracao(double minutos){
 
-        return minutos/60;
+        double ret = minutos/60;
+        Log.d("TOMADAS", " conversao minutos " + String.valueOf(ret));
+        return ret;
     }
     /*
     * params String: tomada1, tomada2, tomada3
@@ -155,13 +175,14 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
     private FIS openFile(String filename){
 
-        String filepath = "/storage/emulated/0/regras" + filename + ".fcl";
+        String filepath = "/storage/emulated/0/" + filename + ".fcl";
 
 
         FIS fis = FIS.load(filepath, true); // Load from 'FCL' file
         if (fis == null) {//erro ao carregar
-            Log.d("DECISAO", " erro carregar arquivo");
+            Log.d("DECISAO", " erro carregar arquivo " + filepath);
         }
+        Log.d("DECISAO", "  carregou com sucesso arquivo");
         return fis;
     }
 }

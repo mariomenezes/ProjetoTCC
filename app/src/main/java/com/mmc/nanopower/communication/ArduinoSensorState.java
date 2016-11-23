@@ -107,6 +107,8 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 try {
 
                     Log.d("TOMADA agora ", " TESTE");
+                    Log.d("TOMADA agora ", URL);
+
                     HttpClient client = new DefaultHttpClient();
                     HttpGet requisicao = new HttpGet();
                     requisicao.setHeader("Content-Type",
