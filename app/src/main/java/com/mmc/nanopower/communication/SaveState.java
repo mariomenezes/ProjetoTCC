@@ -91,28 +91,28 @@ public class SaveState {
 
 
     public void setTemperatura(double t){
-        Log.d("TEMPRATURA", String.valueOf(t));
+        Log.d("SAVESTATE TEMPRATURA", String.valueOf(t));
         temperatura = t;
     }
 
     public void setLuz(double l){
-        Log.d("LUZ", String.valueOf(l));
+        Log.d("SAVESTATE LUZ", String.valueOf(l));
         luz = l;
     }
 
     public void setDiaSemana(double d){
-        Log.d("DIA", String.valueOf(d));
+        Log.d("SAVESTATE DIA", String.valueOf(d));
         diaSemana = d;
     }
 
     public void setHora(double h){
-        Log.d("HORA", String.valueOf(h));
+        Log.d("SAVESTATE HORA", String.valueOf(h));
         hora = h;
     }
 
     public void setMinuto(double h){
-        Log.d("MINUTO", String.valueOf(h));
-        hora = h;
+        Log.d("SAVESTATE MINUTO", String.valueOf(h));
+        minuto = h;
     }
 
     public double getTemperatura(){

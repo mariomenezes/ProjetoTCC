@@ -22,7 +22,8 @@ import java.util.TimerTask;
 public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
 
-    private SaveState saveState = null;
+    //private SaveState saveState = null;
+    private SaveState saveState = SaveState.getInstancia();
     int delay = 60000;   // delay de 1 min.
     int interval = 300000;  // intervalo de 5 min.
     Timer timer = new Timer();
@@ -33,7 +34,7 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                saveState = SaveState.getInstancia();
+//                saveState = SaveState.getInstancia();
 
                 fuzzyTomadas(Tomadas.tomada1.name());
                 fuzzyTomadas(Tomadas.tomada2.name());
@@ -115,14 +116,20 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
     private void fuzzyTomadas(String tomada){
 
         double h = saveState.getHora();
-        double m = converteMinutosFracao(saveState.getMinuto());
+        Log.d("HORA CALCULO", String.valueOf(h));
+        double minuto_temp = saveState.getMinuto();
+        Log.d("MINUTO CALCULO", String.valueOf(minuto_temp));
+        double m = converteMinutosFracao(minuto_temp);
+        Log.d("MIN_CONVER CALCULO", String.valueOf(m));
+
+        Log.d("TOMADAS", "minutos convertidos = "+ String.valueOf(m));
         double r = h + m;
 
         Log.d("TOMADAS", "Fuzzy " + tomada + "valores:");
-        Log.d("TOMADAS",String.valueOf(saveState.getTemperatura()));
-        Log.d("TOMADAS",String.valueOf(saveState.getLuz()));
-        Log.d("TOMADAS",String.valueOf(saveState.getDiaSemana()));
-        Log.d("TOMADAS",String.valueOf(r));
+        Log.d("TOMADAS TEMP",String.valueOf(saveState.getTemperatura()));
+        Log.d("TOMADAS LUZ",String.valueOf(saveState.getLuz()));
+        Log.d("TOMADAS DIA",String.valueOf(saveState.getDiaSemana()));
+        Log.d("TOMADAS HORA",String.valueOf(r));
         FIS fis = openFile(tomada);
         fis.setVariable("temperatura",saveState.getTemperatura());
         fis.setVariable("luz",saveState.getLuz());
@@ -165,8 +172,8 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
     public double converteMinutosFracao(double minutos){
 
-        double ret = minutos/60;
-        Log.d("TOMADAS", " conversao minutos " + String.valueOf(ret));
+        double ret = minutos/60.0;
+        Log.d("TOMADAS", " conversao minutos " + String.valueOf(minutos) + " em " + String.valueOf(ret));
         return ret;
     }
     /*
