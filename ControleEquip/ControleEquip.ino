@@ -48,7 +48,7 @@ EthernetServer server(80);
 int tomada1 = 5;//Arduino digital D5;
 int tomada2 = 6;//Arduino digital D6;
 int tomada3 = 8;//Arduino digital D7;
-//int tomada4 = 8;//Arduino digital D8;
+int tomada_calibracao = 7;//Arduino digital D8;
 //-------------------------------------------------------------------
 String readString = String(30); // string para buscar dados de endereço
 
@@ -89,7 +89,10 @@ void setup()
   pinMode(tomada1, OUTPUT);
   pinMode(tomada2, OUTPUT);
   pinMode(tomada3, OUTPUT);
-  //pinMode(tomada4, OUTPUT);
+
+  //sempre ligada para calibrar sensor de corrente
+  pinMode(tomada_calibracao, OUTPUT);
+  digitalWrite(tomada_calibracao, HIGH);
 
   // Seta porta SdCard
   //pinMode(PIN_SD_CARD, OUTPUT);

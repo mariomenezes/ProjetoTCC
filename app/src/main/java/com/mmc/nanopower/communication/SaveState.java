@@ -58,6 +58,8 @@ public class SaveState {
         switch (name){
             case "tomada1":
                 //Caso tomada ja estiver ligada e o comando for para ligar, entao sera ignorado
+                //TODO verificar state passado, com um state guardado depois do envio do comando em ArduinoSensorState,
+                //TODO ou deixa com o arduino esse processo de ignorar os comandos, apenas diminuindo a frequencia de envio
                 if(getTomada1() != state) {
                     Log.d("SET TOMADA 1", " estado diferente, agendamento inserido");
                     tomada1 = state;
