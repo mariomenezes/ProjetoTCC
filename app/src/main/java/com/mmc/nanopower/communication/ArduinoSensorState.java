@@ -56,9 +56,10 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 o comando, ou deixar o arduino cuidar disso. Talvez o Arduino fique sobrecarregado
                 */
 
-                //informa apenas se existe um acao de ligar ou desligar pendente
-                if(saveState.getFuzzyActiveT1()){
-                    //Caso seja de ligar, será enviado comando de lgiar
+                //informa se existe um acao de ligar ou desligar pendente
+                //e verifica se o estado  atual da tomada eh diferente do comando que se deseja enviar.
+                if(saveState.getFuzzyActiveT1() && (saveState.getStateTomada1Arduino() != saveState.getTomada1())){
+                    //Caso seja de ligar, será enviado comando de ligar
                     if(saveState.getTomada1()) {
                         Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 1");
                         URL += "t1h";
@@ -73,7 +74,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                     saveState.setFuzzyActiveT1(false);
                 }
                 //TOMADA 2
-                else if(saveState.getFuzzyActiveT2()){
+                else if(saveState.getFuzzyActiveT2() && (saveState.getStateTomada2Arduino() != saveState.getTomada2())){
                     //Caso seja de ligar, será enviado comando de lgiar
                     if(saveState.getTomada2()) {
                         Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 2");
@@ -88,7 +89,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                     saveState.setFuzzyActiveT2(false);
                 }
                 //Para tomada 3
-                else if(saveState.getFuzzyActiveT3()){
+                else if(saveState.getFuzzyActiveT3() && (saveState.getStateTomada3Arduino() != saveState.getTomada3())){
                     //Caso seja de ligar, será enviado comando de lgiar
                     if(saveState.getTomada3()) {
                         Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 3");
@@ -170,6 +171,15 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
     }
 
     public void updateSensorStatus(String linha) {
+
+        char t_temp;
+
+        t_temp = linha.charAt(2);
+        saveState.setStateTomada1Arduino((t_temp == 'o'));
+        t_temp = linha.charAt(5);
+        saveState.setStateTomada2Arduino((t_temp == 'o'));
+        t_temp = linha.charAt(8);
+        saveState.setStateTomada3Arduino((t_temp == 'o'));
 
         String t,l,d,h,m;
 

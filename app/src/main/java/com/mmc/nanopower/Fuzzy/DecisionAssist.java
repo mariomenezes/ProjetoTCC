@@ -133,7 +133,16 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
         FIS fis = openFile(tomada);
         fis.setVariable("temperatura",saveState.getTemperatura());
         fis.setVariable("luz",saveState.getLuz());
-        fis.setVariable("dia",saveState.getDiaSemana());
+        double dia_semana = saveState.getDiaSemana();
+
+        //corrige os dias da semana, exemplo
+        if(dia_semana == 1)
+            dia_semana = 7;
+        else
+            dia_semana -= 1;
+
+        //fis.setVariable("dia",saveState.getDiaSemana());
+        fis.setVariable("dia", dia_semana);
         fis.setVariable("hora", r);
 
         //variavel TOMADA1,TOMADA2,TOMADA3
@@ -143,7 +152,7 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
         //Intervalo entre nenhuma possibilidade, 0 e total possibilidade 1.0
         //Serao considerados resultados com pelo menos 0.7 de possibilidade
-        if(res == 1.0){
+        if(res >= 0.7 && res <= 1.0){
                 Log.d(tomada, " Possibilidade de ligar");
             //if(res >= 0.7){
                 saveState.setTomada(tomada, true, res);

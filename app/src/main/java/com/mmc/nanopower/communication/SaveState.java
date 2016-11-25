@@ -24,6 +24,10 @@ public class SaveState {
     private double resTomada2;
     private double resTomada3;
 
+    private boolean stateTomada1Arduino;
+    private boolean stateTomada2Arduino;
+    private boolean stateTomada3Arduino;
+
     private boolean tomada1FuzzyActive;
     private boolean tomada2FuzzyActive;
     private boolean tomada3FuzzyActive;
@@ -60,7 +64,8 @@ public class SaveState {
                 //Caso tomada ja estiver ligada e o comando for para ligar, entao sera ignorado
                 //TODO verificar state passado, com um state guardado depois do envio do comando em ArduinoSensorState,
                 //TODO ou deixa com o arduino esse processo de ignorar os comandos, apenas diminuindo a frequencia de envio
-                if(getTomada1() != state) {
+                //if(getTomada1() != state) {
+                if(getStateTomada1Arduino() != state) {
                     Log.d("SET TOMADA 1", " estado diferente, agendamento inserido");
                     tomada1 = state;
                     resTomada1 = res;
@@ -68,7 +73,8 @@ public class SaveState {
                 }
                 break;
             case "tomada2":
-                if(getTomada2() != state) {
+                //if(getTomada2() != state) {
+                if(getStateTomada2Arduino() != state) {
                     Log.d("SET TOMADA 2", " estado diferente, agendamento inserido");
                     tomada2 = state;
                     resTomada2 = res;
@@ -76,7 +82,8 @@ public class SaveState {
                 }
                 break;
             case "tomada3":
-                if(getTomada3() != state) {
+                //if(getTomada3() != state) {
+                if(getStateTomada3Arduino() != state) {
                     Log.d("SET TOMADA 3", " estado diferente, agendamento inserido");
                     tomada3 = state;
                     resTomada3 = res;
@@ -91,6 +98,28 @@ public class SaveState {
 
     }
 
+    public void setStateTomada1Arduino(boolean res){
+        stateTomada1Arduino = res;
+    }
+
+    public void setStateTomada2Arduino(boolean res){
+        stateTomada2Arduino = res;
+    }
+    public void setStateTomada3Arduino(boolean res){
+        stateTomada3Arduino = res;
+    }
+
+    public boolean getStateTomada1Arduino(){
+        return stateTomada1Arduino;
+    }
+
+    public boolean getStateTomada2Arduino(){
+        return stateTomada2Arduino;
+    }
+
+    public boolean getStateTomada3Arduino(){
+        return stateTomada3Arduino;
+    }
 
     public void setTemperatura(double t){
         Log.d("SAVESTATE TEMPRATURA", String.valueOf(t));
