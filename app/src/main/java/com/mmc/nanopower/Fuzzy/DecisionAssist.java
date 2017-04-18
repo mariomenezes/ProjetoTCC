@@ -161,7 +161,7 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
         }
         //Intervalo entre nenhuma possibilidade, 2.0 e total possibilidade 3.0
         //Serao considerados resultados com pelo menos 2.7 de possibilidade
-        else if(res == 0){
+        else if(res >= 0 && res <= 0.3){
             Log.d(tomada, " Possibilidade de desligar" + res);
            // if(res >= 2.7){
                 Log.d("TOMADAS", " desligamento pendente");

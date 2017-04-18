@@ -178,8 +178,10 @@ for(int i = 1000; i > 0; i--){
  
    if(pinoSensor == 16){   
     //Serial.print(pinoSensor);
-    
-    Serial.println(valorCorrente * tensao);
+    float saida = valorCorrente * tensao;
+    if(saida < 270)
+      Serial.println(saida);
+      //Serial.println(valorCorrente * tensao);
     //Serial.println(" Watts");
   }
   //Serial.print(" ");
