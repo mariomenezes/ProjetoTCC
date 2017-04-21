@@ -35,7 +35,7 @@ public class AprioriClassifi  extends AsyncTask<String, Void, Boolean> {
         try {
             //data = ConverterUtils.DataSource.read("res/dataBase.arff");
 
-
+            Log.d("APRIORI ", "entrou na classe apriori");
             //data = ConverterUtils.DataSource.read("/storage/emulated/0/database.arff");
             data = ConverterUtils.DataSource.read("/storage/emulated/0/baseTesteConv.arff");
         } catch (Exception e) {

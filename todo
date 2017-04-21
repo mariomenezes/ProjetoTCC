@@ -1,0 +1,27 @@
+- verificar necessidade de sensor de calibração
+- se necessário, monitorar 2 equipamentos
+- se não, monitorar 3 equipamentos
+- Escolher entre:
+	- tv
+	- desktop
+	- receptor net tv
+	- receptor net internet
+	- ps3
+	- ventilador (apenas no caso de monitorar equipamento esquecido ligado)
+- Bolar estratégia para monitorar consumo mesmo depois de ter gerado as ações que passam pelo algoritmo da lógica fuzzy
+- Forma de identificar funcionamento em stand by(hard coded?... ou se haverá treinamento)
+- deicidir se será enviada notificação ao celular avisando sobre desligamento
+	- caso envie, se usuário recusar notificação.. agendar para +1h uma nova tentativa ou identificar celular fora da rede.. o que ocorrer primeiro..
+	- caso usuário aceite.. então já desliga
+- decidir se caso não ocorra comunicação com o celular(usuário fora de casa) se o sistema deverá cortar a energia e quais critérios para que isso ocorra
+- quando for desligar algum equipamento pois não está ocorrendo comunicação com o usuário via celular... emitir algum sinal e depois de algum tempo sem confirmação.. q pode ser apertar um botao qualquer no arduino.. desligar o equipamento.
+	
+
+definir as etapas do experimento:
+
+1 - Coleta dos dados de uso das tomadas:
+	requisitos:
+		- Monitorar 2 ou 3 pontos de energia e guardar ações de liga e desliga, 		  temperatura, hora e data.
+2 - 
+
+3 -
