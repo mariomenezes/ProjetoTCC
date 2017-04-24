@@ -6,7 +6,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,11 +24,12 @@ import android.widget.Switch;
 
 
 import com.mmc.nanopower.Fuzzy.DecisionAssist;
+import com.mmc.nanopower.Notification.ExecutaNotification;
 import com.mmc.nanopower.communication.ArduinoSensorState;
 //import com.mmc.nanopower.communication.ExecutarTarefaProgramadaReceiver;
 //import com.mmc.nanopower.communication.SwitchStateListen1;
 import com.mmc.nanopower.Classification.AprioriClassifi;
-import com.mmc.nanopower.communication.ArduinoPostRequest;
+import com.mmc.nanopower.communication.CmdButtonToArduino;
 //import com.mmc.nanopower.communication.SwitchStateListen2;
 //import com.mmc.nanopower.communication.SwitchStateListen3;
 
@@ -40,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private Switch tomada_switch2;
     private Switch tomada_switch3;
     private Button connect_button;
+    private ExecutaNotification executaNotification;
+
+    private static final String TAG = "Classe Princial";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
 
-        //gerarNotificacao();
+            gerarNotificacao();
 
         //TODO test apriori
         new AprioriClassifi().execute();
@@ -88,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if(isChecked){
-                    Log.d("BOTAO1"," pressionado");
-                   new ArduinoPostRequest().execute("t1h");
+                    Log.d(TAG, "BOTAO1 pressionado");
+                   new CmdButtonToArduino().execute("t1h");
                 }else{
-                    new ArduinoPostRequest().execute("t1l");
+                    new CmdButtonToArduino().execute("t1l");
                 }
 
                 }
@@ -107,9 +113,9 @@ public class MainActivity extends AppCompatActivity {
                                          boolean isChecked) {
 
                 if(isChecked){
-                    new ArduinoPostRequest().execute("t2h");
+                    new CmdButtonToArduino().execute("t2h");
                 }else{
-                    new ArduinoPostRequest().execute("t2l");
+                    new CmdButtonToArduino().execute("t2l");
                 }
 
             }
@@ -123,9 +129,9 @@ public class MainActivity extends AppCompatActivity {
                                          boolean isChecked) {
 
                 if(isChecked){
-                    new ArduinoPostRequest().execute("t3h");
+                    new CmdButtonToArduino().execute("t3h");
                 }else{
-                    new ArduinoPostRequest().execute("t3l");
+                    new CmdButtonToArduino().execute("t3l");
                 }
 
             }
@@ -139,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View arg0) {
-                Log.d("CLICOU", " teste");
+                Log.d(TAG, "CLICOU teste");
 
                 new ArduinoSensorState().execute();
 
@@ -177,16 +183,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void gerarNotificacao(){
 
+
+        //parte usada para o broadcast receiver da notificação
+        Intent notificationIntent = new Intent("CHAMAR_METODO_X");
+        PendingIntent btLocationPendingIntent =
+                PendingIntent.getBroadcast(this, 1234, notificationIntent,0);
+
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         PendingIntent p = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setTicker("Ticker Texto");
         builder.setContentTitle("Título");
-        //builder.setContentText("Descrição");
-        //builder.setSmallIcon(R.drawable.;
-        //builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.thiengo));
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
         builder.setContentIntent(p);
+
 
         NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
         String [] descs = new String[]{"Descrição 1", "Descrição 2", "Descrição 3", "Descrição 4"};
@@ -198,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
         Notification n = builder.build();
         n.vibrate = new long[]{150, 300, 150, 600};
         n.flags = Notification.FLAG_AUTO_CANCEL;
-        //nm.notify(R.drawable.ic_launcher, n);
+        nm.notify(R.mipmap.ic_launcher, n);
 
         try{
             Uri som = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -208,58 +221,44 @@ public class MainActivity extends AppCompatActivity {
         catch(Exception e){}
     }
 
-//    @Override
-//    public void onDestroy(){
-//        super.onDestroy();
-//    }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("FUNFOU", "On Start .....");
+        Log.i(TAG, "On Start .....");
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i("FUNFOU", "On Destroy .....");
-    }
-    /* (non-Javadoc)
-    * @see android.app.Activity#onPause()
-    */
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i("FUNFOU", "On Pause .....");
+        Log.i(TAG, "On Destroy .....");
     }
 
-    /* (non-Javadoc)
-    * @see android.app.Activity#onRestart()
-    */
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "On Pause .....");
+        unregisterReceiver(executaNotification);
+        super.onPause();
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.i("FUNFOU", "On Restart .....");
+        Log.i(TAG, "On Restart .....");
     }
 
-    /* (non-Javadoc)
-    * @see android.app.Activity#onResume()
-    */
+
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("FUNFOU", "On Resume .....");
+        Log.i(TAG, "On Resume .....");
+        registerReceiver(executaNotification, new IntentFilter("CHAMAR_METODO_X"));
     }
 
-    /* (non-Javadoc)
-    * @see android.app.Activity#onStart()
-    */
 
-    /* (non-Javadoc)
-    * @see android.app.Activity#onStop()
-    */
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i("FUNFOU", "On Stop .....");
+        Log.i(TAG, "On Stop .....");
     }
 }

@@ -28,6 +28,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
     int delay = 5000;   // delay de 5 seg.
     int interval = 150000;  // intervalo de 2.5 min.
     Timer timer = new Timer();
+    private static final String TAG = "ArduinoSensorState";
 
     public ArduinoSensorState() {
 
@@ -41,7 +42,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
             public void run() {
 
                 //saveState = SaveState.getInstancia();
-                Log.d("ENTROU", " CLASSE");
+                Log.d(TAG, " Entrou no scheduler");
                 String URL = "http://10.10.0.50/";
                 String linha = "";
                 boolean Erro = true;
@@ -61,13 +62,15 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 if(saveState.getFuzzyActiveT1() && (saveState.getStateTomada1Arduino() != saveState.getTomada1())){
                     //Caso seja de ligar, será enviado comando de ligar
                     if(saveState.getTomada1()) {
-                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 1");
+                        Log.d(TAG, " sera enviado ligar tomada 1");
                         URL += "t1h";
-                        Log.d("COMANDO DENTRO DO IF", URL);
+                        //Log.d("COMANDO DENTRO DO IF", URL);
                     }
                     //caso contrario desliga
                     else {
-                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 1");
+                        Log.d(TAG, " sera enviado desligar tomada 1");
+                        //TODO, ao enviar um comando de desligar, tentar enviar notificação ao usuário
+                        //para confirmar o desligamento. Aguardar tempo até a reposta.
                         URL += "t1l";
                     }
                     //Envio sera executado, nao estara mais pendente
@@ -77,12 +80,12 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 else if(saveState.getFuzzyActiveT2() && (saveState.getStateTomada2Arduino() != saveState.getTomada2())){
                     //Caso seja de ligar, será enviado comando de lgiar
                     if(saveState.getTomada2()) {
-                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 2");
+                        Log.d(TAG, " sera enviado ligar tomada 2");
                         URL += "t2h";
                     }
                     //caso contrario desliga
                     else {
-                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 2");
+                        Log.d(TAG, " sera enviado desligar tomada 2");
                         URL += "t2l";
                     }
                     //Envio sera executado, nao estara mais pendente
@@ -92,12 +95,12 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
                 else if(saveState.getFuzzyActiveT3() && (saveState.getStateTomada3Arduino() != saveState.getTomada3())){
                     //Caso seja de ligar, será enviado comando de lgiar
                     if(saveState.getTomada3()) {
-                        Log.d("ENVIO COMANDOS", "sera enviado ligar tomada 3");
+                        Log.d(TAG, " sera enviado ligar tomada 3");
                         URL += "t3h";
                     }
                     //caso contrario desliga
                     else {
-                        Log.d("ENVIO COMANDOS", "sera enviado desligar tomada 3");
+                        Log.d(TAG, " sera enviado desligar tomada 3");
                         URL += "t3l";
                     }
                     //Envio sera executado, nao estara mais pendente
@@ -108,8 +111,8 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
                 try {
 
-                    Log.d("TOMADA agora ", " TESTE");
-                    Log.d("TOMADA agora ", URL);
+                    Log.d(TAG , " Enviando comandos as tomadas");
+                    Log.d(TAG," Destino: " + URL);
 
                     HttpClient client = new DefaultHttpClient();
                     HttpGet requisicao = new HttpGet();
@@ -129,7 +132,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
                     linha = sb.toString();
 
-                    Log.d("CARALHO ", linha);
+                    Log.d(TAG, " recebido: " + linha);
 
 
                     updateSensorStatus(linha);
@@ -139,23 +142,23 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
 
                 } catch (Exception except) {
-                    Log.e("TESTE ", "CRASH StackTrace: " + Arrays.toString(except.getStackTrace()));
+                    Log.e(TAG, " CRASH StackTrace: " + Arrays.toString(except.getStackTrace()));
                     Erro = true;
                 }
 
                 try {
                     Thread.sleep(60000);
                     // Do some stuff
-                    Log.d("SENSOR ", "DORMIU");
+                    Log.d(TAG, " DORMIU");
                 } catch (Exception e) {
                     e.getLocalizedMessage();
                     Erro = true;
                 }
-                Log.d("TESTE", " ACORDOU");
+                Log.d(TAG, " ACORDOU");
 
 
 
-                    Log.d("EXECUTANDO "," amemmmmm1");
+                    Log.d(TAG," EXECUTANDO");
                 }
         }, delay, interval);
 
@@ -166,7 +169,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
 
     private void teste(String read){
         if(read.contains("#t")){
-            Log.d("TEMPOK", read);
+            Log.d(TAG, "TEMPO" + read);
         }
     }
 
@@ -198,13 +201,13 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
         h = linha.substring(idx4 + 1, idx5);
         m = linha.substring(idx5 + 1, idx6);
 
-        Log.d("TEMP",t);
-        Log.d("LUZ",l);
-        Log.d("DIA",d);
-        Log.d("HORA",h);
-        Log.d("MINUTO",m);
+        Log.d(TAG, "TEMP: " + t);
+        Log.d(TAG, "LUZ: " + l);
+        Log.d(TAG, "DIA: " + d);
+        Log.d(TAG, "HORA: " + h);
+        Log.d(TAG, "MINUTO: " + m);
 
-        Log.d("UPDATE", " SENSOR");
+        Log.d(TAG, " UPDATE SENSOR");
 
 //        Double temp = Double.valueOf(t);
 //        Double luz = Double.valueOf(l);
@@ -225,7 +228,7 @@ public class ArduinoSensorState extends AsyncTask<String, String, Boolean> {
         saveState.setMinuto(min);
 
 
-        Log.d("CHEGOU", "FINAL ASENSOR STATE");
+        Log.d(TAG, "CHEGOU AO FINAL");
     }
 
     @Override

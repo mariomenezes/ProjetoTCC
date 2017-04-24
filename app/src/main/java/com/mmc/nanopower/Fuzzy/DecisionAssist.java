@@ -27,6 +27,7 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
     int delay = 60000;   // delay de 1 min.
     int interval = 300000;  // intervalo de 5 min.
     Timer timer = new Timer();
+    private static final String TAG = "DecisionAssist";
 
 
     @Override
@@ -116,20 +117,20 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
     private void fuzzyTomadas(String tomada){
 
         double h = saveState.getHora();
-        Log.d("HORA CALCULO", String.valueOf(h));
+        Log.d(TAG, "HORA CALCULO " + String.valueOf(h));
         double minuto_temp = saveState.getMinuto();
-        Log.d("MINUTO CALCULO", String.valueOf(minuto_temp));
+        Log.d(TAG, "MINUTO CALCULO" + String.valueOf(minuto_temp));
         double m = converteMinutosFracao(minuto_temp);
-        Log.d("MIN_CONVER CALCULO", String.valueOf(m));
+        Log.d(TAG, "MIN_CONVER CALCULO" + String.valueOf(m));
 
-        Log.d("TOMADAS", "minutos convertidos = "+ String.valueOf(m));
+        Log.d(TAG, "minutos convertidos = "+ String.valueOf(m));
         double r = h + m;
 
-        Log.d("TOMADAS", "Fuzzy " + tomada + "valores:");
-        Log.d("TOMADAS TEMP",String.valueOf(saveState.getTemperatura()));
-        Log.d("TOMADAS LUZ",String.valueOf(saveState.getLuz()));
-        Log.d("TOMADAS DIA",String.valueOf(saveState.getDiaSemana()));
-        Log.d("TOMADAS HORA",String.valueOf(r));
+        Log.d(TAG, "Fuzzy " + tomada + "valores:");
+        Log.d(TAG, "TEMP " + String.valueOf(saveState.getTemperatura()));
+        Log.d(TAG, "LUZ " + String.valueOf(saveState.getLuz()));
+        Log.d(TAG, "DIA " + String.valueOf(saveState.getDiaSemana()));
+        Log.d(TAG, "HORA " + String.valueOf(r));
         FIS fis = openFile(tomada);
         fis.setVariable("temperatura",saveState.getTemperatura());
         fis.setVariable("luz",saveState.getLuz());
@@ -148,33 +149,33 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
         //variavel TOMADA1,TOMADA2,TOMADA3
         fis.evaluate();
         double res = fis.getVariable(tomada.toLowerCase()).getLatestDefuzzifiedValue();
-        Log.d("FUZZY ",tomada +" " + String.valueOf(res));
+        Log.d(TAG, "FUZZY " + tomada +" " + String.valueOf(res));
 
         //Intervalo entre nenhuma possibilidade, 0 e total possibilidade 1.0
         //Serao considerados resultados com pelo menos 0.7 de possibilidade
         if(res >= 0.7 && res <= 1.0){
-                Log.d(tomada, " Possibilidade de ligar");
+                Log.d(TAG, tomada + " Possibilidade de ligar");
             //if(res >= 0.7){
                 saveState.setTomada(tomada, true, res);
-                Log.d("TOMADAS", " ligacao pendente");
+                Log.d(TAG, " TOMADAS ligacao pendente");
             //}
         }
         //Intervalo entre nenhuma possibilidade, 2.0 e total possibilidade 3.0
         //Serao considerados resultados com pelo menos 2.7 de possibilidade
         else if(res >= 0 && res <= 0.3){
-            Log.d(tomada, " Possibilidade de desligar" + res);
+            Log.d(TAG, tomada + " Possibilidade de desligar" + res);
            // if(res >= 2.7){
-                Log.d("TOMADAS", " desligamento pendente");
+                Log.d(TAG, " TOMADAS desligamento pendente");
                 saveState.setTomada(tomada, false, res);
             //}
 
         }
         else if(res == -1){
-            Log.d("TOMADAS", " nao encontrou nenhuma regra "+ tomada);
+            Log.d(TAG, " nao encontrou nenhuma regra "+ tomada);
         }
 
         else{
-            Log.d("TOMADAS", "valor desconhecido" + String.valueOf(res));
+            Log.d(TAG, " valor desconhecido" + String.valueOf(res));
         }
     }
 
@@ -182,7 +183,7 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
     public double converteMinutosFracao(double minutos){
 
         double ret = minutos/60.0;
-        Log.d("TOMADAS", " conversao minutos " + String.valueOf(minutos) + " em " + String.valueOf(ret));
+        Log.d(TAG, " conversao minutos " + String.valueOf(minutos) + " em " + String.valueOf(ret));
         return ret;
     }
     /*
@@ -196,9 +197,9 @@ public class DecisionAssist extends AsyncTask<String, Void, Boolean> {
 
         FIS fis = FIS.load(filepath, true); // Load from 'FCL' file
         if (fis == null) {//erro ao carregar
-            Log.d("DECISAO", " erro carregar arquivo " + filepath);
+            Log.d(TAG, " DECISAO erro carregar arquivo " + filepath);
         }
-        Log.d("DECISAO", "  carregou com sucesso arquivo");
+        Log.d(TAG, " DECISAO carregou com sucesso arquivo");
         return fis;
     }
 }

@@ -2,7 +2,6 @@ package com.mmc.nanopower.communication;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 
 /**
  * Created by mario on 03/11/16.
