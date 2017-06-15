@@ -5,7 +5,7 @@ from datetime import *
 import time
 
 # Iniciando conexao serial
-comport = serial.Serial("/dev/ttyACM0", 9600)
+comport = serial.Serial("/dev/cu.usbmodem1421", 9600)
 #comport = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) # Setando timeout 1s para a conexao
 
 PARAM_CARACTER='t'
